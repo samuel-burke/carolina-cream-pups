@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Section, Grid, Eyebrow, Heading, Text, ImageBox, Steps } from "@/components/ui";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { images } from "@/lib/images";
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ const timeline = [
 export default function AboutPage() {
   return (
     <>
+      <Breadcrumbs href="/about" />
       <Section>
         <Eyebrow>About us</Eyebrow>
         <Heading level={1} style={{ maxWidth: 700 }}>

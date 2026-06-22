@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Section, Grid, Eyebrow, Heading, Text, ImageBox } from "@/components/ui";
 import { Masonry } from "@/components/sections/Masonry";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { images } from "@/lib/images";
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ const alumni = [
 export default function GalleryPage() {
   return (
     <>
+      <Breadcrumbs href="/gallery" />
       <Section>
         <Eyebrow>Photo gallery</Eyebrow>
         <Heading level={1}>Our litters, and where they are now.</Heading>

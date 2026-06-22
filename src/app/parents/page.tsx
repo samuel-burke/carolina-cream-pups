@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Section, Grid, Eyebrow, Heading, Text } from "@/components/ui";
 import { ParentProfile } from "@/components/sections/ParentProfile";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { images } from "@/lib/images";
 
 export const metadata: Metadata = {
@@ -44,6 +45,7 @@ const pairing = [
 export default function ParentsPage() {
   return (
     <>
+      <Breadcrumbs href="/parents" />
       <Section>
         <Eyebrow>Meet the parents</Eyebrow>
         <Heading level={1}>Our dams &amp; sires.</Heading>

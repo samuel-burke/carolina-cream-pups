@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Section, Grid, Eyebrow, Heading, Text, Button, Steps } from "@/components/ui";
 import { PuppyCard } from "@/components/sections/PuppyCard";
+import { Faq } from "@/components/sections/Faq";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { currentLitter } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -20,6 +22,7 @@ const process = [
 export default function ReservePage() {
   return (
     <>
+      <Breadcrumbs href="/reserve" />
       <Section>
         <Eyebrow>Reserve a puppy</Eyebrow>
         <Heading level={1}>Meet the {currentLitter.title}.</Heading>
@@ -46,6 +49,15 @@ export default function ReservePage() {
         <div style={{ marginTop: "2rem" }}>
           <Button href="/contact">Start your application</Button>
         </div>
+      </Section>
+
+      {/* FAQ — answers buying questions and feeds FAQ rich results */}
+      <Section>
+        <Eyebrow>Questions</Eyebrow>
+        <Heading level={2} style={{ marginBottom: "2rem" }}>
+          Frequently asked questions.
+        </Heading>
+        <Faq />
       </Section>
     </>
   );

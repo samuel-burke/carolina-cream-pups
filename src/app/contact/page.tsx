@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Section, Grid, Eyebrow, Heading, Text, Card, ImageBox } from "@/components/ui";
 import { ContactForm } from "@/components/sections/ContactForm";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { images } from "@/lib/images";
 import { site } from "@/lib/site";
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <>
+      <Breadcrumbs href="/contact" />
       <Section>
         <Eyebrow>Contact</Eyebrow>
         <Heading level={1}>Let&apos;s talk.</Heading>

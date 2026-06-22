@@ -77,6 +77,18 @@ Update each `alt` to describe the real photo. Then delete
 currently logs them. Wire up an email/CRM provider where marked in
 `src/app/api/contact/route.ts`, using a server-side env var for credentials.
 
+## SEO & analytics
+
+- Per-page metadata, canonical URLs, Open Graph + Twitter cards, and a generated
+  `og.png` social image.
+- Structured data: `LocalBusiness` (site-wide), `BreadcrumbList` (subpages), and
+  `FAQPage` (Reserve page). Sitemap and robots are generated from the nav config.
+- Analytics is off by default. Set `NEXT_PUBLIC_ANALYTICS_DOMAIN` to enable a
+  cookieless, Plausible-compatible script (see `.env.example`).
+
+FAQ content lives in `src/lib/site.ts` (`faqs`) — answers are placeholders;
+edit them to match your real policies before launch.
+
 ## Deployment
 
 Set `NEXT_PUBLIC_SITE_URL` to the production origin (used for canonical URLs,

@@ -45,6 +45,41 @@ export const nav: NavItem[] = [
   { href: "/contact", label: "Contact" },
 ];
 
+/**
+ * Frequently asked questions — rendered as an accordion and emitted as
+ * FAQPage structured data for rich results. Answers below are sensible
+ * placeholders; edit them to match your actual policies before launch.
+ */
+export type Faq = { question: string; answer: string };
+
+export const faqs: Faq[] = [
+  {
+    question: "How do I reserve a puppy?",
+    answer:
+      "Start with a short application — there's no deposit to apply. Once we confirm we're a good fit, a deposit holds your spot in the litter, and you choose your puppy on pick day in birth order by deposit.",
+  },
+  {
+    question: "What comes home with the puppy?",
+    answer:
+      "Each puppy goes home at eight weeks with age-appropriate vaccinations, deworming, a vet health check, and a starter kit. Replace this with your exact list (microchip, food, blanket, registration paperwork, etc.).",
+  },
+  {
+    question: "Are the parents health tested?",
+    answer:
+      "Yes. Both parents have OFA clearances for hips, elbows, heart, and eyes, plus full genetic panels. You can review the clearances on the Meet the Parents page.",
+  },
+  {
+    question: "Do you offer a health guarantee?",
+    answer:
+      "Describe your health guarantee here — what it covers, for how long, and what's expected of you in return (vet visits, diet). This is a key trust signal for buyers.",
+  },
+  {
+    question: "Do you ship puppies or is pickup required?",
+    answer:
+      "State your policy on pickup, ground/flight nanny transport, and the areas you serve. Many families travel to Wake Forest, NC to meet the dogs before bringing a puppy home.",
+  },
+];
+
 /** Current litter status shown in the home-page status band. */
 export const litterStatus = {
   headline: "Spring 2026 litter · 3 spots open",
