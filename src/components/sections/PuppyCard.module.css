@@ -1,0 +1,26 @@
+.body {
+  padding: 1.25rem;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.available {
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  font-weight: 600;
+  color: var(--color-sage-deep);
+  white-space: nowrap;
+}
+
+.reserved {
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  font-weight: 600;
+  color: var(--color-muted);
+  white-space: nowrap;
+}

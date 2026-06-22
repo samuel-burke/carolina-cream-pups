@@ -1,0 +1,25 @@
+.step {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+@media (min-width: 768px) {
+  .step {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    border-top: 2px solid var(--color-sage);
+    padding-top: 1rem;
+  }
+}
+
+.num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--size-mega);
+  line-height: 0.8;
+  color: var(--color-taupe);
+  flex-shrink: 0;
+}

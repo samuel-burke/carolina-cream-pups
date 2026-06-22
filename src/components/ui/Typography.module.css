@@ -1,0 +1,42 @@
+.eyebrow {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--size-lg);
+  color: var(--color-sage);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.12;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.h1 {
+  font-size: var(--size-hero);
+}
+.h2 {
+  font-size: var(--size-xxl);
+}
+.h3 {
+  font-size: var(--size-xl);
+}
+.h4 {
+  font-size: var(--size-lg);
+}
+
+.text {
+  font-family: var(--font-body);
+  font-size: var(--size-base);
+  line-height: 1.7;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.muted {
+  color: var(--color-muted);
+}

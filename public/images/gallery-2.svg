@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-label="Spring litter 2">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F3E9D8"/>
+      <stop offset="1" stop-color="#E7D8BE"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#g)"/>
+  <g transform="translate(232 200) scale(3.36)" fill="#CDB590">
+    <path d="M50 18c-10 0-13 6-20 8-6 2-12 1-12 9 0 6 4 9 9 11 1 9 10 17 23 17s22-8 23-17c5-2 9-5 9-11 0-8-6-7-12-9-7-2-10-8-20-8z"/>
+  </g>
+  <circle cx="400" cy="432" r="272" fill="none" stroke="#8A9A85" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="400" y="752" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="24" letter-spacing="1.5" fill="#3A352E" fill-opacity="0.55">SPRING LITTER 2</text>
+</svg>
