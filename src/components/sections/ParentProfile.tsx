@@ -1,16 +1,14 @@
 import { Grid, Eyebrow, Heading, Text, ImageBox } from "@/components/ui";
-import type { ImageAsset } from "@/lib/images";
+import type { ParentProfile as ParentProfileContent } from "@/lib/content-types";
 import styles from "./ParentProfile.module.css";
 
-type Props = {
-  role: string;
-  name: string;
-  description: string;
-  clearances: string[];
-  image: ImageAsset;
-};
-
-export function ParentProfile({ role, name, description, clearances, image }: Props) {
+export function ParentProfile({
+  role,
+  name,
+  description,
+  clearances,
+  image,
+}: ParentProfileContent) {
   return (
     <Grid cols={2} gap={4} templateDesktop="1fr 1.2fr" className={styles.profile} style={{ alignItems: "center" }}>
       <ImageBox image={image} ratio="4/5" sizes="(max-width: 768px) 100vw, 45vw" />

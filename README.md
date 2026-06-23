@@ -38,7 +38,9 @@ src/
     seo/                   # JSON-LD structured data
   lib/
     theme.ts               # design tokens -> CSS custom properties (single source)
-    site.ts                # business info, nav, copy, litter data
+    site.ts                # brand/business info, nav, SEO config (stable)
+    content-types.ts       # types for all editable content (the CMS contract)
+    content.ts             # async content accessors (the single content doorway)
     images.ts              # image manifest (src + alt + dimensions)
 scripts/
   generate-placeholders.mjs  # regenerates the placeholder images
@@ -54,9 +56,20 @@ queries (breakpoint: 768px) — there is no JS width detection.
 
 ## Content
 
-Editable copy and data live in `src/lib/site.ts` (business info, navigation,
-current litter, available puppies). The sitemap, metadata, and structured data
-all read from here.
+All editable content (litters, puppies, photos, page copy, FAQ, gallery) flows
+through one typed, async layer:
+
+- `src/lib/content-types.ts` — the shape of every piece of content.
+- `src/lib/content.ts` — async accessors (`getHomeContent`, `getLitter`,
+  `getFaqs`, `getGallery`, …). Pages `await` these; to edit content today, change
+  the data returned here.
+
+This indirection is deliberate: it makes adding a CMS later a drop-in change
+(swap the accessor bodies to fetch from the CMS, types stay the same) without
+touching any component or page. See [`docs/SANITY-MIGRATION.md`](docs/SANITY-MIGRATION.md).
+
+Stable, non-editable config (brand/business info, navigation, SEO) stays in
+`src/lib/site.ts` and feeds the sitemap, metadata, and structured data.
 
 ## Images
 

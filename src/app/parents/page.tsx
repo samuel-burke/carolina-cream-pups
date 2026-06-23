@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Section, Grid, Eyebrow, Heading, Text } from "@/components/ui";
 import { ParentProfile } from "@/components/sections/ParentProfile";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
-import { images } from "@/lib/images";
+import { getParentsContent } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Meet the Parents",
@@ -11,68 +11,39 @@ export const metadata: Metadata = {
   alternates: { canonical: "/parents" },
 };
 
-const clearances = ["OFA Hips", "Elbows", "Heart", "Eyes", "Genetic Panel"];
+export default async function ParentsPage() {
+  const content = await getParentsContent();
+  const { pairing } = content;
 
-const parents = [
-  {
-    role: "Dam",
-    name: "Name",
-    description: "Temperament, weight, color, and a sentence on personality and lineage.",
-    clearances,
-    image: images.parentDam,
-  },
-  {
-    role: "Sire",
-    name: "Name",
-    description: "Temperament, weight, color, and a sentence on personality and lineage.",
-    clearances,
-    image: images.parentSire,
-  },
-];
-
-const pairing = [
-  {
-    h: "Temperament",
-    b: "Calm, biddable, people-oriented — bred for family and therapy-style dispositions.",
-  },
-  { h: "Conformation", b: "True English Cream type: blocky heads, light coats, sturdy build." },
-  {
-    h: "Health depth",
-    b: "Generations of cleared lines behind both parents, not just the parents themselves.",
-  },
-];
-
-export default function ParentsPage() {
   return (
     <>
       <Breadcrumbs href="/parents" />
       <Section>
-        <Eyebrow>Meet the parents</Eyebrow>
-        <Heading level={1}>Our dams &amp; sires.</Heading>
+        <Eyebrow>{content.eyebrow}</Eyebrow>
+        <Heading level={1}>{content.heading}</Heading>
         <Text muted style={{ marginTop: "1rem", maxWidth: 600 }}>
-          Health clearances and temperament are everything. Here&apos;s who your puppy comes from —
-          and what these two bring together.
+          {content.intro}
         </Text>
       </Section>
 
       <Section flushTop>
-        {parents.map((p) => (
+        {content.parents.map((p) => (
           <ParentProfile key={p.role} {...p} />
         ))}
       </Section>
 
       {/* The pairing — what this specific cross produces */}
       <Section surface>
-        <Eyebrow>The pairing</Eyebrow>
+        <Eyebrow>{pairing.eyebrow}</Eyebrow>
         <Heading level={2} style={{ maxWidth: 620 }}>
-          What this cross is bred for.
+          {pairing.heading}
         </Heading>
         <Grid cols={3} style={{ marginTop: "2rem" }}>
-          {pairing.map(({ h, b }) => (
-            <div key={h}>
-              <Heading level={4}>{h}</Heading>
+          {pairing.points.map(({ title, body }) => (
+            <div key={title}>
+              <Heading level={4}>{title}</Heading>
               <Text muted style={{ marginTop: "0.5rem" }}>
-                {b}
+                {body}
               </Text>
             </div>
           ))}

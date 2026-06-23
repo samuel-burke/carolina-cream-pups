@@ -1,32 +1,28 @@
 import Image from "next/image";
 import { Container, Heading, Button } from "@/components/ui";
-import { images } from "@/lib/images";
-import { site } from "@/lib/site";
+import type { HomeContent } from "@/lib/content-types";
 import styles from "./HomeHero.module.css";
 
-export function HomeHero() {
-  const hero = images.heroHome;
+export function HomeHero({ hero }: { hero: HomeContent["hero"] }) {
   return (
     <section className={styles.hero} aria-label="Welcome">
       <Image
-        src={hero.src}
-        alt={hero.alt}
+        src={hero.image.src}
+        alt={hero.image.alt}
         fill
         priority
         sizes="100vw"
-        unoptimized={hero.src.endsWith(".svg")}
+        unoptimized={hero.image.src.endsWith(".svg")}
         className={styles.img}
       />
       <div aria-hidden className={styles.scrim} />
       <Container className={styles.content}>
-        <p className={styles.place}>
-          {site.location.city}, {site.location.region}
-        </p>
+        <p className={styles.place}>{hero.place}</p>
         <Heading level={1} className={styles.title}>
-          {site.tagline}
+          {hero.tagline}
         </Heading>
         <div className={styles.actions}>
-          <Button href="/reserve">Join the Waitlist</Button>
+          <Button href={hero.cta.href}>{hero.cta.label}</Button>
         </div>
       </Container>
     </section>

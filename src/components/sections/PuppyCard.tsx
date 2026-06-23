@@ -1,21 +1,12 @@
 import { Card, Heading, Text, Button, ImageBox } from "@/components/ui";
-import { images } from "@/lib/images";
-import type { ImageKey } from "@/lib/images";
+import type { Puppy } from "@/lib/content-types";
 import styles from "./PuppyCard.module.css";
 
-type Props = {
-  name: string;
-  meta: string;
-  note: string;
-  available: boolean;
-  imageKey: ImageKey;
-};
-
-export function PuppyCard({ name, meta, note, available, imageKey }: Props) {
+export function PuppyCard({ name, meta, note, available, image }: Puppy) {
   return (
     <Card flush>
       <ImageBox
-        image={images[imageKey]}
+        image={image}
         ratio="4/5"
         keyline={false}
         radius="top"

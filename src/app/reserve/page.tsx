@@ -3,7 +3,7 @@ import { Section, Grid, Eyebrow, Heading, Text, Button, Steps } from "@/componen
 import { PuppyCard } from "@/components/sections/PuppyCard";
 import { Faq } from "@/components/sections/Faq";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
-import { currentLitter } from "@/lib/site";
+import { getFaqs, getLitter } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Reserve a Puppy",
@@ -19,21 +19,24 @@ const process = [
   { head: "Home", body: "At 8 weeks your puppy goes home, vetted and with a starter kit." },
 ];
 
-export default function ReservePage() {
+export default async function ReservePage() {
+  const litter = await getLitter();
+  const faqs = await getFaqs();
+
   return (
     <>
       <Breadcrumbs href="/reserve" />
       <Section>
         <Eyebrow>Reserve a puppy</Eyebrow>
-        <Heading level={1}>Meet the {currentLitter.title}.</Heading>
+        <Heading level={1}>Meet the {litter.title}.</Heading>
         <Text muted style={{ marginTop: "1rem", maxWidth: 560 }}>
-          {currentLitter.readyNote}
+          {litter.readyNote}
         </Text>
       </Section>
 
       <Section flushTop>
         <Grid cols={3}>
-          {currentLitter.puppies.map((p) => (
+          {litter.puppies.map((p) => (
             <PuppyCard key={p.name} {...p} />
           ))}
         </Grid>
@@ -57,7 +60,7 @@ export default function ReservePage() {
         <Heading level={2} style={{ marginBottom: "2rem" }}>
           Frequently asked questions.
         </Heading>
-        <Faq />
+        <Faq faqs={faqs} />
       </Section>
     </>
   );

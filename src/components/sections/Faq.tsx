@@ -1,11 +1,11 @@
-import { faqs } from "@/lib/site";
+import type { Faq as FaqItem } from "@/lib/content-types";
 import styles from "./Faq.module.css";
 
 /**
  * FAQ accordion built on native <details>/<summary> — works without JS, fully
  * keyboard accessible — plus FAQPage structured data for rich results.
  */
-export function Faq() {
+export function Faq({ faqs }: { faqs: FaqItem[] }) {
   const data = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
