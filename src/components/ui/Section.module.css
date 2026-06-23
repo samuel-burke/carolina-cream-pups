@@ -1,0 +1,26 @@
+.section {
+  padding: 3.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 4.5rem 0;
+  }
+}
+
+.compact {
+  padding: 2rem 0;
+}
+@media (min-width: 768px) {
+  .compact {
+    padding: 2.5rem 0;
+  }
+}
+
+.surface {
+  background: var(--color-surface);
+}
+
+.flushTop {
+  padding-top: 0;
+}

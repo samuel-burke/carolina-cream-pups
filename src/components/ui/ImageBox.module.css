@@ -1,0 +1,29 @@
+.frame {
+  position: relative;
+  width: 100%;
+  background: var(--color-placeholder);
+  overflow: hidden;
+}
+
+.keyline {
+  border: 1px solid var(--color-sage);
+}
+.plainLine {
+  border: 1px solid var(--color-line);
+}
+
+.radiusMd {
+  border-radius: var(--radius-md);
+}
+.radiusTop {
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border: none;
+}
+.radiusNone {
+  border-radius: 0;
+  border: none;
+}
+
+.img {
+  object-fit: cover;
+}

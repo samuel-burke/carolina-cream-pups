@@ -1,0 +1,20 @@
+.logo {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--size-lg);
+  color: var(--color-text);
+  letter-spacing: 0.5px;
+}
+
+.dark {
+  color: var(--color-bg);
+}
+
+.accent {
+  font-style: italic;
+  color: var(--color-sage);
+}
+
+.dark .accent {
+  color: var(--color-taupe);
+}

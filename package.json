@@ -1,0 +1,35 @@
+{
+  "name": "carolina-cream-pups",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Marketing site for Carolina Cream Pups — AKC English Cream Golden Retrievers, Wake Forest, NC.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "gen:assets": "node scripts/generate-placeholders.mjs && node scripts/generate-og.mjs"
+  },
+  "dependencies": {
+    "next": "15.5.19",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "3.2.0",
+    "@types/node": "22.10.0",
+    "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.0",
+    "eslint": "9.18.0",
+    "eslint-config-next": "15.5.19",
+    "sharp": "^0.33.5",
+    "typescript": "5.7.3",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}

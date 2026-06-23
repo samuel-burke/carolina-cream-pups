@@ -1,0 +1,22 @@
+.profile {
+  margin-bottom: 2.5rem;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge {
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-sage);
+  color: var(--color-sage-deep);
+}

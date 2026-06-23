@@ -1,2 +1,109 @@
-# carolina-cream-pups
-Site for carolinacreampups.com
+# Carolina Cream Pups
+
+Marketing site for [carolinacreampups.com](https://carolinacreampups.com) — a
+family raising AKC English Cream Golden Retrievers in Wake Forest, NC.
+
+Built with **Next.js (App Router) + TypeScript**, styled with CSS Modules driven
+by a single design-token source, and fully static-rendered for speed and SEO.
+
+## Getting started
+
+```bash
+npm install
+npm run dev        # http://localhost:3000
+```
+
+Other scripts:
+
+```bash
+npm run build      # production build
+npm run start      # serve the production build
+npm run lint       # ESLint
+npm run typecheck  # tsc --noEmit
+```
+
+## Project structure
+
+```
+src/
+  app/                     # routes (one folder per page) + sitemap/robots/api
+    layout.tsx             # fonts, metadata, JSON-LD, nav/footer shell
+    page.tsx               # Home
+    about/ parents/ reserve/ gallery/ contact/
+    api/contact/route.ts   # contact form endpoint (validation + delivery hook)
+  components/
+    ui/                    # design-system kit (Button, Heading, Grid, ...)
+    layout/                # Nav, Footer, Logo
+    sections/              # page-specific composite sections
+    seo/                   # JSON-LD structured data
+  lib/
+    theme.ts               # design tokens -> CSS custom properties (single source)
+    site.ts                # brand/business info, nav, SEO config (stable)
+    content-types.ts       # types for all editable content (the CMS contract)
+    content.ts             # async content accessors (the single content doorway)
+    images.ts              # image manifest (src + alt + dimensions)
+scripts/
+  generate-placeholders.mjs  # regenerates the placeholder images
+public/images/             # image assets
+```
+
+## Theming
+
+All visual tokens live in `src/lib/theme.ts`. They are emitted as CSS custom
+properties at the document root, and every component reads `var(--token)`. To
+re-theme the whole site, edit that one file. Responsiveness uses real CSS media
+queries (breakpoint: 768px) — there is no JS width detection.
+
+## Content
+
+All editable content (litters, puppies, photos, page copy, FAQ, gallery) flows
+through one typed, async layer:
+
+- `src/lib/content-types.ts` — the shape of every piece of content.
+- `src/lib/content.ts` — async accessors (`getHomeContent`, `getLitter`,
+  `getFaqs`, `getGallery`, …). Pages `await` these; to edit content today, change
+  the data returned here.
+
+This indirection is deliberate: it makes adding a CMS later a drop-in change
+(swap the accessor bodies to fetch from the CMS, types stay the same) without
+touching any component or page. See [`docs/SANITY-MIGRATION.md`](docs/SANITY-MIGRATION.md).
+
+Stable, non-editable config (brand/business info, navigation, SEO) stays in
+`src/lib/site.ts` and feeds the sitemap, metadata, and structured data.
+
+## Images
+
+Every image is registered in `src/lib/images.ts` with its `src`, `alt`, and
+intrinsic dimensions. The current files in `public/images` are generated,
+on-brand placeholders. To use real photos:
+
+1. Drop the real file into `public/images` using the same filename, **or**
+2. Point the entry's `src` at a CDN URL (and add the host to
+   `images.remotePatterns` in `next.config.mjs`).
+
+Update each `alt` to describe the real photo. Then delete
+`scripts/generate-placeholders.mjs` once placeholders are no longer needed.
+
+## Contact form
+
+`POST /api/contact` validates submissions (with a honeypot for spam) and
+currently logs them. Wire up an email/CRM provider where marked in
+`src/app/api/contact/route.ts`, using a server-side env var for credentials.
+
+## SEO & analytics
+
+- Per-page metadata, canonical URLs, Open Graph + Twitter cards, and a generated
+  `og.png` social image.
+- Structured data: `LocalBusiness` (site-wide), `BreadcrumbList` (subpages), and
+  `FAQPage` (Reserve page). Sitemap and robots are generated from the nav config.
+- Analytics is off by default. Set `NEXT_PUBLIC_ANALYTICS_DOMAIN` to enable a
+  cookieless, Plausible-compatible script (see `.env.example`).
+
+FAQ content lives in `src/lib/site.ts` (`faqs`) — answers are placeholders;
+edit them to match your real policies before launch.
+
+## Deployment
+
+Set `NEXT_PUBLIC_SITE_URL` to the production origin (used for canonical URLs,
+Open Graph, sitemap, and robots). The site is static-first and deploys cleanly
+to Vercel or any Node host (`npm run build && npm run start`).
