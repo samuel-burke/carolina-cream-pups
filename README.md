@@ -109,15 +109,17 @@ edit them to match your real policies before launch.
 
 ## Deployment
 
-Continuous deployment runs on **GitHub Actions → Vercel**, gated by CI: the
-`deploy` job runs only after lint/typecheck/test/build pass.
+Hosting is on **Vercel via its native Git integration** — every push deploys
+automatically, no tokens or secrets.
 
-| Branch | Environment | Domain                       |
-| ------ | ----------- | ---------------------------- |
-| `main` | production  | `carolinacreampups.com`      |
-| `dev`  | staging     | `beta.carolinacreampups.com` (noindex) |
+| Branch | Vercel env | Domain                        |
+| ------ | ---------- | ----------------------------- |
+| `main` | Production | `carolinacreampups.com`       |
+| `dev`  | Preview    | `beta.carolinacreampups.com` (noindex) |
 
-`NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_NOINDEX` are set per-environment in
-Vercel. Full one-time setup (secrets, env vars, domains) is in
-[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). The site also runs on any Node host
-via `npm run build && npm run start`.
+GitHub Actions runs the `verify` check (lint/typecheck/test/build); require it via
+branch protection on `main` so production only builds from green code.
+`NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_IMAGE_BASE_URL`, and `NEXT_PUBLIC_NOINDEX`
+are set per-environment in Vercel. Full one-time setup (project import, env vars,
+domains, branch protection) is in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). The
+site also runs on any Node host via `npm run build && npm run start`.

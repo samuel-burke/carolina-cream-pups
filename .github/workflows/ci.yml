@@ -1,4 +1,4 @@
-name: CI / CD
+name: CI
 
 on:
   push:
@@ -38,40 +38,6 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: https://carolinacreampups.com
 
-  # Deploy only after `verify` passes, and only on pushes to main/dev
-  # (pull requests never deploy). Production env vars (NEXT_PUBLIC_SITE_URL,
-  # NEXT_PUBLIC_NOINDEX) are configured per-environment in the Vercel project.
-  deploy:
-    needs: verify
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Deploy to production (main)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          vercel build --prod --token="$VERCEL_TOKEN"
-          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
-
-      - name: Deploy to staging (dev) and alias beta domain
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
-          vercel build --token="$VERCEL_TOKEN"
-          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
-          echo "Deployed staging build to $url"
-          vercel alias set "$url" beta.carolinacreampups.com --token="$VERCEL_TOKEN"
+# Deployment is handled by Vercel's native Git integration (connect the repo in
+# the Vercel dashboard) — no deploy job here. Require this `verify` check via
+# branch protection on `main` so production only builds from green code.
