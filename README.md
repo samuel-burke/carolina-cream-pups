@@ -99,11 +99,20 @@ currently logs them. Wire up an email/CRM provider where marked in
 - Analytics is off by default. Set `NEXT_PUBLIC_ANALYTICS_DOMAIN` to enable a
   cookieless, Plausible-compatible script (see `.env.example`).
 
-FAQ content lives in `src/lib/site.ts` (`faqs`) — answers are placeholders;
+FAQ content lives in `src/lib/content.ts` (`getFaqs`) — answers are placeholders;
 edit them to match your real policies before launch.
 
 ## Deployment
 
-Set `NEXT_PUBLIC_SITE_URL` to the production origin (used for canonical URLs,
-Open Graph, sitemap, and robots). The site is static-first and deploys cleanly
-to Vercel or any Node host (`npm run build && npm run start`).
+Continuous deployment runs on **GitHub Actions → Vercel**, gated by CI: the
+`deploy` job runs only after lint/typecheck/test/build pass.
+
+| Branch | Environment | Domain                       |
+| ------ | ----------- | ---------------------------- |
+| `main` | production  | `carolinacreampups.com`      |
+| `dev`  | staging     | `beta.carolinacreampups.com` (noindex) |
+
+`NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_NOINDEX` are set per-environment in
+Vercel. Full one-time setup (secrets, env vars, domains) is in
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). The site also runs on any Node host
+via `npm run build && npm run start`.

@@ -28,6 +28,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# vercel
+.vercel
+
 # editor
 .vscode/*
 !.vscode/extensions.json
