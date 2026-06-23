@@ -60,13 +60,17 @@ All editable content (litters, puppies, photos, page copy, FAQ, gallery) flows
 through one typed, async layer:
 
 - `src/lib/content-types.ts` — the shape of every piece of content.
-- `src/lib/content.ts` — async accessors (`getHomeContent`, `getLitter`,
+- `src/lib/content.ts` — async accessors (`getHomeContent`, `getReserve`,
   `getFaqs`, `getGallery`, …). Pages `await` these; to edit content today, change
   the data returned here.
 
-This indirection is deliberate: it makes adding a CMS later a drop-in change
-(swap the accessor bodies to fetch from the CMS, types stay the same) without
-touching any component or page. See [`docs/SANITY-MIGRATION.md`](docs/SANITY-MIGRATION.md).
+This indirection is deliberate: it makes swapping the source a drop-in change
+(types stay the same) without touching any component or page.
+
+**The litter & waitlists are editable without code** via a Google Sheet —
+`getReserve`/`getLitterStatus` read it when `GOOGLE_SHEET_ID` is set, and fall
+back to in-code defaults otherwise. See [`docs/ADMIN-SHEETS.md`](docs/ADMIN-SHEETS.md).
+(A fuller CMS for copy/media remains an option: [`docs/SANITY-MIGRATION.md`](docs/SANITY-MIGRATION.md).)
 
 Stable, non-editable config (brand/business info, navigation, SEO) stays in
 `src/lib/site.ts` and feeds the sitemap, metadata, and structured data.

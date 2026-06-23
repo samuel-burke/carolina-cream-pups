@@ -12,6 +12,7 @@
  * enforced by the types in content-types.ts.
  */
 import { galleryImages, images } from "./images";
+import { fetchSheetRows, sheetsConfigured } from "./sheets";
 import type {
   AboutContent,
   Faq,
@@ -21,6 +22,8 @@ import type {
   ParentsContent,
   ReserveContent,
   TestimonialsContent,
+  Waitlist,
+  WaitlistState,
 } from "./content-types";
 
 export async function getHomeContent(): Promise<HomeContent> {
@@ -174,38 +177,119 @@ export async function getGallery(): Promise<GalleryContent> {
   };
 }
 
-export async function getLitterStatus(): Promise<LitterStatus> {
+/**
+ * Operational data (current litter + the two waitlists) is editable in a Google
+ * Sheet when GOOGLE_SHEET_ID is set; otherwise these in-code defaults are used
+ * (dev/CI/sandbox and as a resilient fallback if the sheet is unreachable).
+ */
+const RESERVE_SUMMARY =
+  "We reserve by waitlist, not by individual puppy. Join the male or female list with a deposit; when the litter arrives you choose in list order from the puppies of that sex — so your number is your pick order.";
+
+const RESERVE_DEFAULTS: ReserveContent = {
+  status: "born",
+  title: "Spring 2026 litter",
+  timingLabel: "Born March 2nd · ready for homes late April",
+  summary: RESERVE_SUMMARY,
+  counts: "4 males · 2 females",
+  pairing: { damName: "Name", damImage: images.parentDam, sireName: "Name", sireImage: images.parentSire },
+  waitlists: {
+    male: { sex: "Male", state: "open", reservations: 2 },
+    female: {
+      sex: "Female",
+      state: "full",
+      reservations: 5,
+      note: "Next openings expected with the summer litter.",
+    },
+  },
+};
+
+const LITTER_STATUS_DEFAULT: LitterStatus = {
+  headline: "Spring 2026 litter · waitlists open",
+  detail: "Next litter expected late summer.",
+  cta: { label: "See the litter & waitlists", href: "/reserve" },
+};
+
+const asState = (s: string): WaitlistState =>
+  s === "open" || s === "full" || s === "closed" ? s : "closed";
+
+/** Build one Waitlist from the sheet rows (matched by sex), with safe coercion. */
+function listFromRows(rows: Record<string, string>[], sex: "Male" | "Female"): Waitlist {
+  const r = rows.find((x) => (x.sex ?? "").toLowerCase() === sex.toLowerCase());
+  const reservations = Number.parseInt(r?.reservations ?? "", 10);
   return {
-    headline: "Spring 2026 litter · waitlists open",
-    detail: "Next litter expected late summer.",
+    sex,
+    state: asState((r?.state ?? "").toLowerCase()),
+    reservations: Number.isFinite(reservations) ? reservations : 0,
+    note: r?.note ? r.note : undefined,
+  };
+}
+
+/** Pure mapper: Sheet rows -> ReserveContent (images come from the manifest). */
+export function mapReserveRows(
+  litterRows: Record<string, string>[],
+  waitlistRows: Record<string, string>[],
+): ReserveContent {
+  const l = litterRows[0] ?? {};
+  return {
+    status: l.status === "expected" ? "expected" : "born",
+    title: l.title || RESERVE_DEFAULTS.title,
+    timingLabel: l.timingLabel || RESERVE_DEFAULTS.timingLabel,
+    summary: RESERVE_SUMMARY,
+    counts: l.counts || undefined,
+    pairing: {
+      damName: l.damName || "Name",
+      damImage: images.parentDam,
+      sireName: l.sireName || "Name",
+      sireImage: images.parentSire,
+    },
+    waitlists: {
+      male: listFromRows(waitlistRows, "Male"),
+      female: listFromRows(waitlistRows, "Female"),
+    },
+  };
+}
+
+/** Pure mapper: Sheet rows -> the home status band. */
+export function mapLitterStatusRows(
+  litterRows: Record<string, string>[],
+  waitlistRows: Record<string, string>[],
+): LitterStatus {
+  const l = litterRows[0] ?? {};
+  const title = l.title || RESERVE_DEFAULTS.title;
+  const male = listFromRows(waitlistRows, "Male");
+  const female = listFromRows(waitlistRows, "Female");
+  const anyOpen = male.state === "open" || female.state === "open";
+  return {
+    headline: `${title} · ${anyOpen ? "waitlists open" : "waitlist updates"}`,
+    detail: l.timingLabel || LITTER_STATUS_DEFAULT.detail,
     cta: { label: "See the litter & waitlists", href: "/reserve" },
   };
 }
 
+export async function getLitterStatus(): Promise<LitterStatus> {
+  if (!sheetsConfigured()) return LITTER_STATUS_DEFAULT;
+  try {
+    const [litter, lists] = await Promise.all([
+      fetchSheetRows("Litter"),
+      fetchSheetRows("Waitlists"),
+    ]);
+    return mapLitterStatusRows(litter, lists);
+  } catch {
+    return LITTER_STATUS_DEFAULT;
+  }
+}
+
 export async function getReserve(): Promise<ReserveContent> {
-  return {
-    status: "born",
-    title: "Spring 2026 litter",
-    timingLabel: "Born March 2nd · ready for homes late April",
-    summary:
-      "We reserve by waitlist, not by individual puppy. Join the male or female list with a deposit; when the litter arrives you choose in list order from the puppies of that sex — so your number is your pick order.",
-    counts: "4 males · 2 females",
-    pairing: {
-      damName: "Name",
-      damImage: images.parentDam,
-      sireName: "Name",
-      sireImage: images.parentSire,
-    },
-    waitlists: {
-      male: { sex: "Male", state: "open", reservations: 2 },
-      female: {
-        sex: "Female",
-        state: "full",
-        reservations: 5,
-        note: "Next openings expected with the summer litter.",
-      },
-    },
-  };
+  if (!sheetsConfigured()) return RESERVE_DEFAULTS;
+  try {
+    const [litter, lists] = await Promise.all([
+      fetchSheetRows("Litter"),
+      fetchSheetRows("Waitlists"),
+    ]);
+    return mapReserveRows(litter, lists);
+  } catch {
+    return RESERVE_DEFAULTS;
+  }
 }
 
 export async function getTestimonials(): Promise<TestimonialsContent> {
