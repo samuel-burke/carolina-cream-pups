@@ -95,6 +95,26 @@ A pipeline handles sizing, compression, dimensions, and blur previews for you:
 4. `npm run build`. Commit the optimized files in `public/images` and the
    updated manifest/metadata.
 
+### Adding photos from a raw dump (e.g. a WordPress export)
+
+If your photos are a folder tree (e.g. `wp-content/uploads/2024/10/…`), don't
+clean it up by hand:
+
+1. Drop the whole tree into `photos-src/`. The scanner (`scripts/scan-photos.mjs`)
+   recurses and automatically ignores `elementor`/`thumbs` caches and WordPress
+   size-variants (`-300x200`, `-scaled`, …), keeping only the largest original of
+   each image.
+2. Run `npm run photos:catalog` → generates numbered contact sheets in
+   `photo-catalog/` (gitignored) plus `index.json`. Open the sheets to see every
+   candidate photo with its number.
+3. Create `photos.map.json` mapping each slot to a catalog number (or a path),
+   e.g. `{ "hero": 7, "puppy-willow": 12, "gallery-1": 3 }`.
+4. Run `npm run photos` → optimizes only the mapped photos into
+   `public/images/<slot>.jpg` with dimensions + blur metadata.
+5. The output filenames already match the slot keys, so update `alt` text in
+   `src/lib/images.ts` (and any `src` still pointing at a `.svg`), then
+   `npm run build` and commit.
+
 Alternatively, host on an external CDN and set the entry's `src` to a full URL
 (add the host to `images.remotePatterns` in `next.config.mjs`).
 

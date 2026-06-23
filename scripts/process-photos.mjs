@@ -1,78 +1,102 @@
 /**
  * PHOTO PIPELINE — turn raw originals into fast, web-ready images.
  *
- * Input:  drop originals into `photos-src/` (gitignored), named after the slot
- *         they fill — e.g. hero.jpg, puppy-biscuit.jpg, gallery-1.jpg. The base
- *         name should match what `src/lib/images.ts` references.
- * Output: optimized JPEGs in `public/images/<name>.jpg` (committed), plus
- *         `src/lib/image-meta.generated.json` with each image's real
- *         width/height and a tiny blurDataURL for the blur-up placeholder.
+ * Input:  photos-src/ (gitignored). Either a curated set named after slots
+ *         (hero.jpg, puppy-willow.jpg, …) or a raw dump of WordPress month
+ *         folders — the scanner skips elementor/thumbs and -WxH variants and
+ *         recurses, so nested year/month layouts work as-is.
+ * Output: optimized JPEGs in public/images/<slot>.jpg (committed) + each image's
+ *         real width/height and a blur preview in src/lib/image-meta.generated.json.
+ *
+ * Two modes:
+ *   - Mapping mode (preferred for a dump): create photos.map.json mapping each
+ *     slot to a catalog number or path, e.g. { "hero": 7, "puppy-willow": "2024/10/willow.jpg" }.
+ *     Use `npm run photos:catalog` first to get the numbers.
+ *   - Auto mode (curated): no map file — every original whose basename matches a
+ *     slot is processed (basename becomes the output slot).
  *
  * Run: npm run photos
- *
- * Why: large phone photos are slow and bloat git. We downscale to a sane max
- * edge, strip EXIF, compress with mozjpeg, and precompute a blur preview so the
- * page reserves the right space (no layout shift) and feels instant.
  */
 import sharp from "sharp";
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { dirname, extname, basename, join } from "node:path";
+import { dirname, basename, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { scanOriginals } from "./scan-photos.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const SRC = join(ROOT, "photos-src");
 const OUT = join(ROOT, "public", "images");
 const META = join(ROOT, "src", "lib", "image-meta.generated.json");
+const MAP = join(ROOT, "photos.map.json");
+const CATALOG_INDEX = join(ROOT, "photo-catalog", "index.json");
 
-const MAX_EDGE = 2000; // px on the long side — plenty for full-bleed on retina
-const QUALITY = 72; // mozjpeg quality; visually clean, well compressed
-const SUPPORTED = new Set([".jpg", ".jpeg", ".png", ".webp", ".tiff", ".avif"]);
+const MAX_EDGE = 2000;
+const QUALITY = 72;
 
 if (!existsSync(SRC)) {
-  console.error(`No photos-src/ folder found. Create it and add originals, e.g.:
-  photos-src/hero.jpg, photos-src/puppy-biscuit.jpg
-Then re-run: npm run photos`);
+  console.error("No photos-src/ folder. Add photos (whole month folders are fine) and re-run.");
+  process.exit(1);
+}
+
+const originals = await scanOriginals(SRC);
+if (originals.length === 0) {
+  console.error("No original images found under photos-src/.");
+  process.exit(1);
+}
+
+// Build the list of { slot, path } jobs from either the map or basenames.
+const jobs = [];
+if (existsSync(MAP)) {
+  const map = JSON.parse(await readFile(MAP, "utf8"));
+  const byNumber = existsSync(CATALOG_INDEX)
+    ? new Map(JSON.parse(await readFile(CATALOG_INDEX, "utf8")).map((e) => [e.n, e.rel]))
+    : new Map();
+
+  for (const [slot, ref] of Object.entries(map)) {
+    let match;
+    if (typeof ref === "number") {
+      const rel = byNumber.get(ref);
+      match = rel && originals.find((o) => o.rel === rel);
+      if (!match) console.warn(`! slot "${slot}": catalog #${ref} not found (run npm run photos:catalog)`);
+    } else {
+      const needle = String(ref);
+      match =
+        originals.find((o) => o.rel === needle) ??
+        originals.find((o) => o.rel.endsWith(needle)) ??
+        originals.find((o) => basename(o.rel) === needle);
+      if (!match) console.warn(`! slot "${slot}": no original matching "${ref}"`);
+    }
+    if (match) jobs.push({ slot, path: match.path });
+  }
+} else {
+  for (const o of originals) jobs.push({ slot: basename(o.rel, extname(o.rel)), path: o.path });
+}
+
+if (jobs.length === 0) {
+  console.error("Nothing to process. Create photos.map.json (see npm run photos:catalog).");
   process.exit(1);
 }
 
 await mkdir(OUT, { recursive: true });
-
-const entries = (await readdir(SRC)).filter((f) => SUPPORTED.has(extname(f).toLowerCase()));
-if (entries.length === 0) {
-  console.error(`No supported images in photos-src/ (${[...SUPPORTED].join(", ")}).
-Note: HEIC isn't supported — export/convert to JPEG first.`);
-  process.exit(1);
-}
-
-// Preserve any existing meta (for files processed in previous runs).
 const meta = existsSync(META) ? JSON.parse(await readFile(META, "utf8")) : {};
 
-for (const file of entries) {
-  const name = basename(file, extname(file));
-  const outName = `${name}.jpg`;
-  const input = await readFile(join(SRC, file));
-
-  // .rotate() bakes in EXIF orientation, then metadata is dropped by default.
-  const pipeline = sharp(input)
-    .rotate()
-    .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: "inside", withoutEnlargement: true });
-
-  const buf = await pipeline.jpeg({ quality: QUALITY, mozjpeg: true }).toBuffer();
+for (const { slot, path } of jobs) {
+  const outName = `${slot}.jpg`;
+  const buf = await sharp(await readFile(path))
+    .rotate() // bake in EXIF orientation, then metadata is dropped
+    .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: "inside", withoutEnlargement: true })
+    .jpeg({ quality: QUALITY, mozjpeg: true })
+    .toBuffer();
   await writeFile(join(OUT, outName), buf);
 
   const { width, height } = await sharp(buf).metadata();
-
-  // Tiny blurred preview (~20px wide) as a base64 data URI.
   const blur = await sharp(buf).resize(20).blur().webp({ quality: 40 }).toBuffer();
-  const blurDataURL = `data:image/webp;base64,${blur.toString("base64")}`;
-
-  meta[outName] = { width, height, blurDataURL };
-  console.log(`✓ ${file} -> public/images/${outName} (${width}x${height})`);
+  meta[outName] = { width, height, blurDataURL: `data:image/webp;base64,${blur.toString("base64")}` };
+  console.log(`✓ ${slot}  <-  ${path.replace(SRC + "/", "")}  (${width}x${height})`);
 }
 
 await writeFile(META, JSON.stringify(meta, null, 2) + "\n");
-console.log(`\nUpdated ${META}.
-Next: in src/lib/images.ts point the relevant entries' src at the new ".jpg"
-filenames and update their alt text, then \`npm run build\`.`);
+console.log(`\nProcessed ${jobs.length} photo(s) into public/images.`);
+console.log(`If any output names differ from the manifest, update src/lib/images.ts 'src' + 'alt'.`);

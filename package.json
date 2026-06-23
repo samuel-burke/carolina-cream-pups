@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "gen:assets": "node scripts/generate-placeholders.mjs && node scripts/generate-og.mjs",
+    "photos:catalog": "node scripts/catalog-photos.mjs",
     "photos": "node scripts/process-photos.mjs"
   },
   "dependencies": {
