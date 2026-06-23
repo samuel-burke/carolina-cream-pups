@@ -1,4 +1,4 @@
-import { Card, Text } from "@/components/ui";
+import { Card, Text, ImageBox } from "@/components/ui";
 import type { Testimonial } from "@/lib/content-types";
 import styles from "./TestimonialCard.module.css";
 
@@ -13,15 +13,26 @@ function Stars({ rating }: { rating: number }) {
 }
 
 export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
-  const { quote, name, location, rating } = testimonial;
+  const { quote, name, location, rating, image } = testimonial;
   return (
-    <Card style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-      {rating ? <Stars rating={rating} /> : null}
-      <blockquote className={styles.quote}>“{quote}”</blockquote>
-      <Text style={{ fontWeight: 600, marginTop: "auto" }}>
-        {name}
-        {location ? <span className={styles.location}> · {location}</span> : null}
-      </Text>
+    <Card flush style={{ display: "flex", flexDirection: "column" }}>
+      {image ? (
+        <ImageBox
+          image={image}
+          ratio="4/3"
+          radius="top"
+          keyline={false}
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
+      ) : null}
+      <div className={styles.body}>
+        {rating ? <Stars rating={rating} /> : null}
+        <blockquote className={styles.quote}>“{quote}”</blockquote>
+        <Text style={{ fontWeight: 600, marginTop: "auto" }}>
+          {name}
+          {location ? <span className={styles.location}> · {location}</span> : null}
+        </Text>
+      </div>
     </Card>
   );
 }

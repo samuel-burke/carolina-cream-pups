@@ -53,6 +53,8 @@ export type Testimonial = {
   location?: string;
   /** 1–5; omit if you don't want a star rating shown. */
   rating?: number;
+  /** Optional photo of the family's dog, shown on top of the card. */
+  image?: ImageAsset;
 };
 
 export type TestimonialsContent = {

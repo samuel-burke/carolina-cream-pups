@@ -69,6 +69,10 @@ export const images = {
   alumniCooper: slot("alumni-cooper", "Cooper, a golden retriever therapy dog in Raleigh, NC", 800, 800),
   alumniDaisy: slot("alumni-daisy", "Daisy, a grown golden retriever, three years old at the Outer Banks", 800, 800),
   contactMap: slot("contact-map", "Map showing our location in Wake Forest, North Carolina", 800, 600),
+  testimonial1: slot("testimonial-1", "A family's grown English Cream Golden Retriever", 800, 600),
+  testimonial2: slot("testimonial-2", "A family's grown English Cream Golden Retriever", 800, 600),
+  testimonial3: slot("testimonial-3", "A family's grown English Cream Golden Retriever", 800, 600),
+  testimonial4: slot("testimonial-4", "A family's grown English Cream Golden Retriever", 800, 600),
 } as const;
 
 export type ImageKey = keyof typeof images;

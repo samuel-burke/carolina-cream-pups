@@ -53,6 +53,10 @@ const files = [
   ["contact-map.svg", 800, 600, "Map / location"],
   // Appended at the end so existing placeholders keep their tone (index-based).
   ["parent-3.svg", 800, 1000, "Parent"],
+  ["testimonial-1.svg", 800, 600, "Family dog"],
+  ["testimonial-2.svg", 800, 600, "Family dog"],
+  ["testimonial-3.svg", 800, 600, "Family dog"],
+  ["testimonial-4.svg", 800, 600, "Family dog"],
 ];
 
 function svg(w, h, label, i) {

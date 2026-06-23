@@ -1,3 +1,11 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  flex: 1;
+}
+
 .quote {
   margin: 0;
   font-family: var(--font-display);

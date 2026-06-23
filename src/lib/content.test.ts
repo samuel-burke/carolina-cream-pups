@@ -106,6 +106,7 @@ describe("getTestimonials()", () => {
         expect(item.rating).toBeGreaterThanOrEqual(1);
         expect(item.rating).toBeLessThanOrEqual(5);
       }
+      if (item.image) expectValidImage(item.image);
     }
   });
 });

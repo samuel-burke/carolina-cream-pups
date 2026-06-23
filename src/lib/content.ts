@@ -221,6 +221,7 @@ export async function getTestimonials(): Promise<TestimonialsContent> {
         name: "The Harrisons",
         location: "Raleigh, NC",
         rating: 5,
+        image: images.testimonial1,
       },
       {
         quote:
@@ -228,6 +229,7 @@ export async function getTestimonials(): Promise<TestimonialsContent> {
         name: "Megan & Tyler",
         location: "Charlotte, NC",
         rating: 5,
+        image: images.testimonial2,
       },
       {
         quote:
@@ -235,6 +237,7 @@ export async function getTestimonials(): Promise<TestimonialsContent> {
         name: "The Bennetts",
         location: "Wilmington, NC",
         rating: 5,
+        image: images.testimonial3,
       },
       {
         quote:
@@ -242,6 +245,7 @@ export async function getTestimonials(): Promise<TestimonialsContent> {
         name: "Dana P.",
         location: "the Outer Banks",
         rating: 5,
+        image: images.testimonial4,
       },
     ],
   };
