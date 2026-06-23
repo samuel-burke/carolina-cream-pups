@@ -3,7 +3,8 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { Analytics } from "@/components/seo/Analytics";
+import { Analytics as PlausibleAnalytics } from "@/components/seo/Analytics";
+import { Analytics } from "@vercel/analytics/next";
 import { cssVariables } from "@/lib/theme";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <main id="main">{children}</main>
         <Footer />
+        <PlausibleAnalytics />
         <Analytics />
       </body>
     </html>
