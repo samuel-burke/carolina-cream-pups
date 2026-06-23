@@ -7,10 +7,10 @@ blur placeholders) is committed.
 
 ## How it fits together
 
-- `src/lib/images.ts` — the manifest. Each slot is either:
-  - `img("hero.svg", …)` — a local placeholder in `/public/images`, or
-  - `photo("hero.jpg", "hero.svg", …)` — a real photo on the CDN. The second arg
-    is the placeholder to fall back to when the CDN env var is unset (dev/CI).
+- `src/lib/images.ts` — the manifest. Each slot is `slot("hero", alt, w, h)` and
+  resolves automatically: the R2 photo when its `<name>.jpg` metadata exists and
+  the CDN env var is set, otherwise the local `<name>.svg` placeholder. No manual
+  edits are needed to switch a slot over — committing the metadata does it.
 - `NEXT_PUBLIC_IMAGE_BASE_URL` — the R2 public origin (e.g.
   `https://images.carolinacreampups.com`). `photo()` builds its URL from this,
   and `next.config.mjs` adds the host to `images.remotePatterns` automatically.
@@ -43,17 +43,18 @@ Two ways — pick whichever you prefer:
    compressed) and dimensions + blur are written to `image-meta.generated.json`.
 5. Upload everything in `r2-upload/` to the bucket (drag-drop in the R2 dashboard,
    or `rclone`/`aws s3 sync` with an R2 token).
-6. In `src/lib/images.ts`, switch each migrated slot from `img("x.svg", …)` to
-   `photo("x.jpg", "x.svg", …)` and write real `alt` text. Commit the manifest +
-   metadata.
+6. Commit `image-meta.generated.json` (and `photos.map.json`). Each processed slot
+   switches to its real photo automatically — no manifest edits. (Optionally tidy
+   the `alt` text in `src/lib/images.ts`.)
 
 ### B. Drag-drop straight to R2 (simplest, no local tooling)
 
 Upload images named after their slots (`hero.jpg`, `puppy-willow.jpg`, …) directly
-in the R2 dashboard, then switch those slots to `photo("…​.jpg", "…​.svg", …)` in
-the manifest. You skip the local optimize step (Vercel still optimizes on delivery),
-but you won't get the blur-up placeholder unless the metadata exists. For best
-results upload reasonably sized images (≤ ~2500px), not 24‑megapixel originals.
+in the R2 dashboard. For a slot to switch over, it still needs a metadata entry —
+add `{ "hero.jpg": { "width": W, "height": H } }` to `image-meta.generated.json`
+(blur optional). You skip the local optimize step (Vercel still optimizes on
+delivery), but no blur-up placeholder. Upload reasonably sized images (≤ ~2500px),
+not 24‑megapixel originals.
 
 ## Why this design
 

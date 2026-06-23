@@ -77,13 +77,13 @@ Real photos are hosted on a **Cloudflare R2 CDN** (not in git) and served via
 `next/image` (`ImageBox`), which lazy-loads, serves responsive AVIF/WebP, and
 shows a blur-up placeholder. Only the hero is `priority`; everything else is lazy.
 
-Each slot is registered in `src/lib/images.ts` as either a local placeholder
-(`img("hero.svg", …)`) or a CDN photo (`photo("hero.jpg", "hero.svg", …)`, where
-the second arg is the placeholder used when the CDN is unconfigured). The CDN
-origin comes from `NEXT_PUBLIC_IMAGE_BASE_URL`; when unset, everything falls back
-to `/public/images` so dev/CI work without the CDN.
+Each slot is registered in `src/lib/images.ts` by name (e.g. `slot("hero", …)`)
+and resolves **automatically**: it serves the optimized R2 photo once that
+photo's metadata exists (and `NEXT_PUBLIC_IMAGE_BASE_URL` is set), otherwise it
+shows the local SVG placeholder. So adding photos needs **no manifest edits** —
+run the pipeline, upload, commit the metadata, and each slot switches itself.
 
-The optimization pipeline (`npm run photos:catalog` → map → `npm run photos`)
+The pipeline (`npm run photos:catalog` → fill `photos.map.json` → `npm run photos`)
 handles WordPress dumps, sizing, compression, and blur metadata, staging files in
 `r2-upload/` for upload to the bucket.
 
