@@ -11,7 +11,7 @@
  * To edit content TODAY (developer): change the data below. The shapes are
  * enforced by the types in content-types.ts.
  */
-import { images } from "./images";
+import { galleryImages, images } from "./images";
 import type {
   AboutContent,
   Faq,
@@ -146,14 +146,13 @@ export async function getGallery(): Promise<GalleryContent> {
     litter: {
       title: "Spring 2026 litter",
       born: "Born March 2nd",
-      images: [
-        { image: images.gallery1, ratio: "4/5" },
-        { image: images.gallery2, ratio: "1/1" },
-        { image: images.gallery3, ratio: "3/4" },
-        { image: images.gallery4, ratio: "4/3" },
-        { image: images.gallery5, ratio: "1/1" },
-        { image: images.gallery6, ratio: "3/4" },
-      ],
+      // Renders every gallery photo uploaded (any count); ratio comes from each
+      // photo's real dimensions so the masonry stays natural. Falls back to the
+      // placeholder grid until real gallery photos are added.
+      images: galleryImages().map((image) => ({
+        image,
+        ratio: `${image.width}/${image.height}`,
+      })),
     },
     alumni: {
       eyebrow: "Where they are now",

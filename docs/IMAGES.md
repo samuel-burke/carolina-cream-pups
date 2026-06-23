@@ -47,6 +47,21 @@ Two ways — pick whichever you prefer:
    switches to its real photo automatically — no manifest edits. (Optionally tidy
    the `alt` text in `src/lib/images.ts`.)
 
+### The photo gallery (bulk, any number of photos)
+
+The gallery page shows **every** gallery photo you add — not a fixed count. Add
+them in one command (no per-photo mapping):
+
+1. Put your gallery-worthy shots in a `gallery-src/` folder (gitignored).
+2. `npm run photos:gallery` → optimizes them into `r2-upload/gallery-1.jpg`,
+   `gallery-2.jpg`, … (numbered in filename order) with dimensions + blur.
+3. Upload `r2-upload/gallery-*.jpg` to the R2 bucket.
+4. Commit `image-meta.generated.json`. The gallery renders all of them
+   automatically, in order, with natural aspect ratios.
+
+Re-running replaces the gallery set, so prefix filenames (`01-`, `02-`, …) if you
+want to control the order.
+
 ### Cleaning up duplicate sizes (optional)
 
 You don't need this for the website — the pipeline already ignores WordPress size

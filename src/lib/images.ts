@@ -71,3 +71,39 @@ export const images = {
 } as const;
 
 export type ImageKey = keyof typeof images;
+
+const GALLERY_PLACEHOLDERS: ImageAsset[] = [
+  images.gallery1,
+  images.gallery2,
+  images.gallery3,
+  images.gallery4,
+  images.gallery5,
+  images.gallery6,
+];
+
+/**
+ * The full photo gallery — every `gallery-<n>.jpg` present in the metadata (any
+ * count, numerically ordered) served from the CDN, or the placeholder grid when
+ * no real gallery photos have been added. Populate with `npm run photos:gallery`.
+ */
+export function galleryImages(): ImageAsset[] {
+  const nums = Object.keys(meta)
+    .map((k) => /^gallery-(\d+)\.jpg$/.exec(k))
+    .filter((m): m is RegExpExecArray => m !== null)
+    .map((m) => Number(m[1]))
+    .sort((a, b) => a - b);
+
+  if (base && nums.length) {
+    return nums.map((n) => {
+      const m = meta[`gallery-${n}.jpg`]!;
+      return {
+        src: `${base}/gallery-${n}.jpg`,
+        alt: `English Cream Golden Retriever — gallery photo ${n}`,
+        width: m.width,
+        height: m.height,
+        blurDataURL: m.blurDataURL,
+      };
+    });
+  }
+  return GALLERY_PLACEHOLDERS;
+}
