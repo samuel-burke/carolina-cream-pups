@@ -17,9 +17,9 @@ import type {
   Faq,
   GalleryContent,
   HomeContent,
-  Litter,
   LitterStatus,
   ParentsContent,
+  ReserveContent,
 } from "./content-types";
 
 export async function getHomeContent(): Promise<HomeContent> {
@@ -175,41 +175,35 @@ export async function getGallery(): Promise<GalleryContent> {
 
 export async function getLitterStatus(): Promise<LitterStatus> {
   return {
-    headline: "Spring 2026 litter · 3 spots open",
+    headline: "Spring 2026 litter · waitlists open",
     detail: "Next litter expected late summer.",
-    cta: { label: "See available puppies", href: "/reserve" },
+    cta: { label: "See the litter & waitlists", href: "/reserve" },
   };
 }
 
-export async function getLitter(): Promise<Litter> {
+export async function getReserve(): Promise<ReserveContent> {
   return {
+    status: "born",
     title: "Spring 2026 litter",
-    born: "Born March 2nd",
-    readyNote:
-      "Born March 2nd · ready for homes late April. Three still looking for their families.",
-    puppies: [
-      {
-        name: "Biscuit",
-        meta: "Male · cream",
-        note: "The confident one — first to every new thing, loves people.",
-        available: true,
-        image: images.puppyBiscuit,
+    timingLabel: "Born March 2nd · ready for homes late April",
+    summary:
+      "We reserve by waitlist, not by individual puppy. Join the male or female list with a deposit; when the litter arrives you choose in list order from the puppies of that sex — so your number is your pick order.",
+    counts: "4 males · 2 females",
+    pairing: {
+      damName: "Name",
+      damImage: images.parentDam,
+      sireName: "Name",
+      sireImage: images.parentSire,
+    },
+    waitlists: {
+      male: { sex: "Male", state: "open", reservations: 2 },
+      female: {
+        sex: "Female",
+        state: "full",
+        reservations: 5,
+        note: "Next openings expected with the summer litter.",
       },
-      {
-        name: "Willow",
-        meta: "Female · light gold",
-        note: "Gentle and watchful. Settles fast, great with kids.",
-        available: true,
-        image: images.puppyWillow,
-      },
-      {
-        name: "Sailor",
-        meta: "Male · cream",
-        note: "Playful and food-motivated — will be a joy to train.",
-        available: true,
-        image: images.puppySailor,
-      },
-    ],
+    },
   };
 }
 
@@ -218,7 +212,7 @@ export async function getFaqs(): Promise<Faq[]> {
     {
       question: "How do I reserve a puppy?",
       answer:
-        "Start with a short application — there's no deposit to apply. Once we confirm we're a good fit, a deposit holds your spot in the litter, and you choose your puppy on pick day in birth order by deposit.",
+        "Start with a short application — there's no deposit to apply. Once we're a good fit, a deposit reserves your numbered spot on either the male or female waitlist. When the litter arrives, families choose in list order from the puppies of that sex — you reserve a spot in line, not a specific puppy.",
     },
     {
       question: "What comes home with the puppy?",

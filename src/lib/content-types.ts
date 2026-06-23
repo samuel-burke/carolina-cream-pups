@@ -18,19 +18,33 @@ export type LitterStatus = {
   cta: Cta;
 };
 
-export type Puppy = {
-  name: string;
-  meta: string;
-  note: string;
-  available: boolean;
-  image: ImageAsset;
+export type WaitlistState = "open" | "full" | "closed";
+
+/** One sex-specific reservation waitlist. Position = pick order. */
+export type Waitlist = {
+  sex: "Male" | "Female";
+  state: WaitlistState;
+  reservations: number;
+  note?: string;
 };
 
-export type Litter = {
+/** Compact dam × sire pairing for the current/upcoming litter. */
+export type LitterPairing = {
+  damName: string;
+  damImage: ImageAsset;
+  sireName: string;
+  sireImage: ImageAsset;
+};
+
+export type ReserveContent = {
+  status: "expected" | "born";
   title: string;
-  born: string;
-  readyNote: string;
-  puppies: Puppy[];
+  timingLabel: string;
+  summary: string;
+  /** Shown when born (e.g. "4 males · 2 females"); omit while expected. */
+  counts?: string;
+  pairing: LitterPairing;
+  waitlists: { male: Waitlist; female: Waitlist };
 };
 
 export type Faq = { question: string; answer: string };

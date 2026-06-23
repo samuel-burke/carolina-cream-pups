@@ -7,7 +7,7 @@ import {
   getFaqs,
   getGallery,
   getHomeContent,
-  getLitter,
+  getReserve,
   getLitterStatus,
   getParentsContent,
 } from "./content";
@@ -59,14 +59,21 @@ describe("getParentsContent()", () => {
   });
 });
 
-describe("getLitter() & getLitterStatus()", () => {
-  it("returns puppies with names, notes, and valid images", async () => {
-    const litter = await getLitter();
-    expect(litter.puppies.length).toBeGreaterThan(0);
-    for (const puppy of litter.puppies) {
-      expect(puppy.name.trim().length).toBeGreaterThan(0);
-      expect(puppy.note.trim().length).toBeGreaterThan(0);
-      expectValidImage(puppy.image);
+describe("getReserve() & getLitterStatus()", () => {
+  it("returns litter info, a valid parent pairing, and two waitlists", async () => {
+    const reserve = await getReserve();
+    expect(reserve.summary.trim().length).toBeGreaterThan(0);
+    expect(reserve.timingLabel.trim().length).toBeGreaterThan(0);
+    expect(["expected", "born"]).toContain(reserve.status);
+
+    expectValidImage(reserve.pairing.damImage);
+    expectValidImage(reserve.pairing.sireImage);
+
+    for (const list of [reserve.waitlists.male, reserve.waitlists.female]) {
+      expect(["Male", "Female"]).toContain(list.sex);
+      expect(["open", "full", "closed"]).toContain(list.state);
+      expect(Number.isInteger(list.reservations)).toBe(true);
+      expect(list.reservations).toBeGreaterThanOrEqual(0);
     }
   });
 
