@@ -67,9 +67,9 @@ through one typed, async layer:
 This indirection is deliberate: it makes swapping the source a drop-in change
 (types stay the same) without touching any component or page.
 
-**The litter & waitlists are editable without code** via a Google Sheet —
-`getReserve`/`getLitterStatus` read it when `GOOGLE_SHEET_ID` is set, and fall
-back to in-code defaults otherwise. See [`docs/ADMIN-SHEETS.md`](docs/ADMIN-SHEETS.md).
+**The litter & waitlists are editable without code** via Airtable —
+`getReserve`/`getLitterStatus` read it when `AIRTABLE_API_KEY` + `AIRTABLE_BASE_ID`
+are set, and fall back to in-code defaults otherwise. See [`docs/ADMIN-AIRTABLE.md`](docs/ADMIN-AIRTABLE.md).
 (A fuller CMS for copy/media remains an option: [`docs/SANITY-MIGRATION.md`](docs/SANITY-MIGRATION.md).)
 
 Stable, non-editable config (brand/business info, navigation, SEO) stays in

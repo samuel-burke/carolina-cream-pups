@@ -2,13 +2,13 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 /**
- * On-demand revalidation for sheet-backed content. Lets edits in the Google Sheet
+ * On-demand revalidation for Airtable-backed content. Lets edits in Airtable
  * appear within seconds instead of waiting out the ISR window.
  *
  *   POST /api/revalidate?secret=YOUR_SECRET
  *
- * Set REVALIDATE_SECRET in the environment and call this from a Google Apps
- * Script onEdit trigger (optional — without it, edits still appear within ~5 min).
+ * Set REVALIDATE_SECRET in the environment and call this from an Airtable
+ * automation (optional — without it, edits still appear within ~5 min).
  */
 export const runtime = "nodejs";
 

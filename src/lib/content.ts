@@ -12,7 +12,7 @@
  * enforced by the types in content-types.ts.
  */
 import { galleryImages, images } from "./images";
-import { fetchSheetRows, sheetsConfigured } from "./sheets";
+import { airtableConfigured, fetchTable } from "./airtable";
 import type {
   AboutContent,
   Faq,
@@ -178,9 +178,10 @@ export async function getGallery(): Promise<GalleryContent> {
 }
 
 /**
- * Operational data (current litter + the two waitlists) is editable in a Google
- * Sheet when GOOGLE_SHEET_ID is set; otherwise these in-code defaults are used
- * (dev/CI/sandbox and as a resilient fallback if the sheet is unreachable).
+ * Operational data (current litter + the two waitlists) is editable in Airtable
+ * when AIRTABLE_API_KEY + AIRTABLE_BASE_ID are set; otherwise these in-code
+ * defaults are used (dev/CI/sandbox and as a resilient fallback if Airtable is
+ * unreachable).
  */
 const RESERVE_SUMMARY =
   "We reserve by waitlist, not by individual puppy. Join the male or female list with a deposit; when the litter arrives you choose in list order from the puppies of that sex — so your number is your pick order.";
@@ -212,34 +213,43 @@ const LITTER_STATUS_DEFAULT: LitterStatus = {
 const asState = (s: string): WaitlistState =>
   s === "open" || s === "full" || s === "closed" ? s : "closed";
 
-/** Build one Waitlist from the sheet rows (matched by sex), with safe coercion. */
-function listFromRows(rows: Record<string, string>[], sex: "Male" | "Female"): Waitlist {
-  const r = rows.find((x) => (x.sex ?? "").toLowerCase() === sex.toLowerCase());
-  const reservations = Number.parseInt(r?.reservations ?? "", 10);
+/** Coerce an Airtable field to a trimmed string (single-selects/text). */
+const str = (v: unknown): string => (typeof v === "string" ? v.trim() : v == null ? "" : String(v));
+
+/** Coerce an Airtable field to a non-negative integer (number field). */
+const num = (v: unknown): number => {
+  const n = typeof v === "number" ? v : Number.parseInt(str(v), 10);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+};
+
+/** Build one Waitlist from the rows (matched by sex), with safe coercion. */
+function listFromRows(rows: Record<string, unknown>[], sex: "Male" | "Female"): Waitlist {
+  const r = rows.find((x) => str(x.sex).toLowerCase() === sex.toLowerCase());
+  const note = str(r?.note);
   return {
     sex,
-    state: asState((r?.state ?? "").toLowerCase()),
-    reservations: Number.isFinite(reservations) ? reservations : 0,
-    note: r?.note ? r.note : undefined,
+    state: asState(str(r?.state).toLowerCase()),
+    reservations: num(r?.reservations),
+    note: note ? note : undefined,
   };
 }
 
-/** Pure mapper: Sheet rows -> ReserveContent (images come from the manifest). */
+/** Pure mapper: Airtable rows -> ReserveContent (images come from the manifest). */
 export function mapReserveRows(
-  litterRows: Record<string, string>[],
-  waitlistRows: Record<string, string>[],
+  litterRows: Record<string, unknown>[],
+  waitlistRows: Record<string, unknown>[],
 ): ReserveContent {
   const l = litterRows[0] ?? {};
   return {
-    status: l.status === "expected" ? "expected" : "born",
-    title: l.title || RESERVE_DEFAULTS.title,
-    timingLabel: l.timingLabel || RESERVE_DEFAULTS.timingLabel,
+    status: str(l.status) === "expected" ? "expected" : "born",
+    title: str(l.title) || RESERVE_DEFAULTS.title,
+    timingLabel: str(l.timingLabel) || RESERVE_DEFAULTS.timingLabel,
     summary: RESERVE_SUMMARY,
-    counts: l.counts || undefined,
+    counts: str(l.counts) || undefined,
     pairing: {
-      damName: l.damName || "Name",
+      damName: str(l.damName) || "Name",
       damImage: images.parentDam,
-      sireName: l.sireName || "Name",
+      sireName: str(l.sireName) || "Name",
       sireImage: images.parentSire,
     },
     waitlists: {
@@ -249,30 +259,27 @@ export function mapReserveRows(
   };
 }
 
-/** Pure mapper: Sheet rows -> the home status band. */
+/** Pure mapper: Airtable rows -> the home status band. */
 export function mapLitterStatusRows(
-  litterRows: Record<string, string>[],
-  waitlistRows: Record<string, string>[],
+  litterRows: Record<string, unknown>[],
+  waitlistRows: Record<string, unknown>[],
 ): LitterStatus {
   const l = litterRows[0] ?? {};
-  const title = l.title || RESERVE_DEFAULTS.title;
+  const title = str(l.title) || RESERVE_DEFAULTS.title;
   const male = listFromRows(waitlistRows, "Male");
   const female = listFromRows(waitlistRows, "Female");
   const anyOpen = male.state === "open" || female.state === "open";
   return {
     headline: `${title} · ${anyOpen ? "waitlists open" : "waitlist updates"}`,
-    detail: l.timingLabel || LITTER_STATUS_DEFAULT.detail,
+    detail: str(l.timingLabel) || LITTER_STATUS_DEFAULT.detail,
     cta: { label: "See the litter & waitlists", href: "/reserve" },
   };
 }
 
 export async function getLitterStatus(): Promise<LitterStatus> {
-  if (!sheetsConfigured()) return LITTER_STATUS_DEFAULT;
+  if (!airtableConfigured()) return LITTER_STATUS_DEFAULT;
   try {
-    const [litter, lists] = await Promise.all([
-      fetchSheetRows("Litter"),
-      fetchSheetRows("Waitlists"),
-    ]);
+    const [litter, lists] = await Promise.all([fetchTable("Litter"), fetchTable("Waitlists")]);
     return mapLitterStatusRows(litter, lists);
   } catch {
     return LITTER_STATUS_DEFAULT;
@@ -280,12 +287,9 @@ export async function getLitterStatus(): Promise<LitterStatus> {
 }
 
 export async function getReserve(): Promise<ReserveContent> {
-  if (!sheetsConfigured()) return RESERVE_DEFAULTS;
+  if (!airtableConfigured()) return RESERVE_DEFAULTS;
   try {
-    const [litter, lists] = await Promise.all([
-      fetchSheetRows("Litter"),
-      fetchSheetRows("Waitlists"),
-    ]);
+    const [litter, lists] = await Promise.all([fetchTable("Litter"), fetchTable("Waitlists")]);
     return mapReserveRows(litter, lists);
   } catch {
     return RESERVE_DEFAULTS;
