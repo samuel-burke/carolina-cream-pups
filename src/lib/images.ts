@@ -46,15 +46,26 @@ const img = (file: string, alt: string, width: number, height: number): ImageAss
 
 /**
  * Real photo hosted on the image CDN. Once a photo is uploaded to the bucket,
- * switch a slot from `img("…​.svg", …)` to `photo("…​.jpg", …)`. Dimensions and
- * the blur placeholder come from image-meta.generated.json (produced by
- * `npm run photos`).
+ * switch a slot from `img("hero.svg", …)` to
+ * `photo("hero.jpg", "hero.svg", …)` — the second arg is the local placeholder
+ * to fall back to when NEXT_PUBLIC_IMAGE_BASE_URL is unset (dev/CI), so the build
+ * never points at a missing local file. Dimensions and the blur placeholder come
+ * from image-meta.generated.json (produced by `npm run photos`).
  */
-export const photo = (file: string, alt: string, width: number, height: number): ImageAsset =>
-  withMeta(file, base ? `${base}/${file}` : `/images/${file}`, alt, width, height);
+export const photo = (
+  file: string,
+  placeholder: string,
+  alt: string,
+  width: number,
+  height: number,
+): ImageAsset =>
+  base
+    ? withMeta(file, `${base}/${file}`, alt, width, height)
+    : withMeta(placeholder, `/images/${placeholder}`, alt, width, height);
 
 export const images = {
-  heroHome: img(
+  heroHome: photo(
+    "hero.jpg",
     "hero.svg",
     "An English Cream Golden Retriever resting in soft natural light",
     1600,

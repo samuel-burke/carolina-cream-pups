@@ -78,9 +78,10 @@ Real photos are hosted on a **Cloudflare R2 CDN** (not in git) and served via
 shows a blur-up placeholder. Only the hero is `priority`; everything else is lazy.
 
 Each slot is registered in `src/lib/images.ts` as either a local placeholder
-(`img("hero.svg", …)`) or a CDN photo (`photo("hero.jpg", …)`). The CDN origin
-comes from `NEXT_PUBLIC_IMAGE_BASE_URL`; when unset, everything falls back to
-`/public/images` so dev/CI work without the CDN.
+(`img("hero.svg", …)`) or a CDN photo (`photo("hero.jpg", "hero.svg", …)`, where
+the second arg is the placeholder used when the CDN is unconfigured). The CDN
+origin comes from `NEXT_PUBLIC_IMAGE_BASE_URL`; when unset, everything falls back
+to `/public/images` so dev/CI work without the CDN.
 
 The optimization pipeline (`npm run photos:catalog` → map → `npm run photos`)
 handles WordPress dumps, sizing, compression, and blur metadata, staging files in

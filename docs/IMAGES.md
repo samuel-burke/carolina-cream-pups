@@ -9,7 +9,8 @@ blur placeholders) is committed.
 
 - `src/lib/images.ts` — the manifest. Each slot is either:
   - `img("hero.svg", …)` — a local placeholder in `/public/images`, or
-  - `photo("hero.jpg", …)` — a real photo on the CDN.
+  - `photo("hero.jpg", "hero.svg", …)` — a real photo on the CDN. The second arg
+    is the placeholder to fall back to when the CDN env var is unset (dev/CI).
 - `NEXT_PUBLIC_IMAGE_BASE_URL` — the R2 public origin (e.g.
   `https://images.carolinacreampups.com`). `photo()` builds its URL from this,
   and `next.config.mjs` adds the host to `images.remotePatterns` automatically.
@@ -43,13 +44,14 @@ Two ways — pick whichever you prefer:
 5. Upload everything in `r2-upload/` to the bucket (drag-drop in the R2 dashboard,
    or `rclone`/`aws s3 sync` with an R2 token).
 6. In `src/lib/images.ts`, switch each migrated slot from `img("x.svg", …)` to
-   `photo("x.jpg", …)` and write real `alt` text. Commit the manifest + metadata.
+   `photo("x.jpg", "x.svg", …)` and write real `alt` text. Commit the manifest +
+   metadata.
 
 ### B. Drag-drop straight to R2 (simplest, no local tooling)
 
 Upload images named after their slots (`hero.jpg`, `puppy-willow.jpg`, …) directly
-in the R2 dashboard, then switch those slots to `photo("…​.jpg", …)` in the
-manifest. You skip the local optimize step (Vercel still optimizes on delivery),
+in the R2 dashboard, then switch those slots to `photo("…​.jpg", "…​.svg", …)` in
+the manifest. You skip the local optimize step (Vercel still optimizes on delivery),
 but you won't get the blur-up placeholder unless the metadata exists. For best
 results upload reasonably sized images (≤ ~2500px), not 24‑megapixel originals.
 
