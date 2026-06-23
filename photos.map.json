@@ -1,0 +1,32 @@
+{
+  "hero": 1,
+
+  "breeder-home": 2,
+
+  "diff-puppy-culture": 3,
+  "diff-health-tested": 4,
+  "diff-ens": 5,
+
+  "about-portrait": 6,
+
+  "parent-dam": 7,
+  "parent-sire": 8,
+  "parent-3": 9,
+
+  "puppy-biscuit": 9,
+  "puppy-willow": 10,
+  "puppy-sailor": 11,
+
+  "gallery-1": 12,
+  "gallery-2": 13,
+  "gallery-3": 14,
+  "gallery-4": 15,
+  "gallery-5": 16,
+  "gallery-6": 17,
+
+  "alumni-luna": 18,
+  "alumni-cooper": 19,
+  "alumni-daisy": 20,
+
+  "contact-map": 21
+}

@@ -34,8 +34,14 @@ export const site = {
   },
 } as const;
 
-export type NavItem = { href: string; label: string };
+/**
+ * When true, the site asks search engines not to index it. Set
+ * NEXT_PUBLIC_NOINDEX=1 in non-production environments (e.g. the beta/staging
+ * deploy) so staging never competes with production in search results.
+ */
+export const noindex = process.env.NEXT_PUBLIC_NOINDEX === "1";
 
+export type NavItem = { href: string; label: string };
 /** Primary navigation. Order here drives the header and footer. */
 export const nav: NavItem[] = [
   { href: "/", label: "Home" },

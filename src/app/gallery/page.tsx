@@ -27,19 +27,7 @@ export default async function GalleryPage() {
       </Section>
 
       <Section flushTop>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
-            gap: "1rem",
-          }}
-        >
-          <Heading level={3}>{litter.title}</Heading>
-          <Text muted style={{ fontSize: "var(--size-sm)" }}>
-            {litter.born}
-          </Text>
-        </div>
+        <Heading level={3}>{litter.title}</Heading>
         <div style={{ marginTop: "1.25rem" }}>
           <Masonry items={litter.images} />
         </div>

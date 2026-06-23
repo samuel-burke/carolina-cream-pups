@@ -51,6 +51,8 @@ const files = [
   ["alumni-cooper.svg", 800, 800, "Cooper, grown up"],
   ["alumni-daisy.svg", 800, 800, "Daisy, grown up"],
   ["contact-map.svg", 800, 600, "Map / location"],
+  // Appended at the end so existing placeholders keep their tone (index-based).
+  ["parent-3.svg", 800, 1000, "Parent"],
 ];
 
 function svg(w, h, label, i) {

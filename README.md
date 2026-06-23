@@ -73,16 +73,22 @@ Stable, non-editable config (brand/business info, navigation, SEO) stays in
 
 ## Images
 
-Every image is registered in `src/lib/images.ts` with its `src`, `alt`, and
-intrinsic dimensions. The current files in `public/images` are generated,
-on-brand placeholders. To use real photos:
+Real photos are hosted on a **Cloudflare R2 CDN** (not in git) and served via
+`next/image` (`ImageBox`), which lazy-loads, serves responsive AVIF/WebP, and
+shows a blur-up placeholder. Only the hero is `priority`; everything else is lazy.
 
-1. Drop the real file into `public/images` using the same filename, **or**
-2. Point the entry's `src` at a CDN URL (and add the host to
-   `images.remotePatterns` in `next.config.mjs`).
+Each slot is registered in `src/lib/images.ts` by name (e.g. `slot("hero", …)`)
+and resolves **automatically**: it serves the optimized R2 photo once that
+photo's metadata exists (and `NEXT_PUBLIC_IMAGE_BASE_URL` is set), otherwise it
+shows the local SVG placeholder. So adding photos needs **no manifest edits** —
+run the pipeline, upload, commit the metadata, and each slot switches itself.
 
-Update each `alt` to describe the real photo. Then delete
-`scripts/generate-placeholders.mjs` once placeholders are no longer needed.
+The pipeline (`npm run photos:catalog` → fill `photos.map.json` → `npm run photos`)
+handles WordPress dumps, sizing, compression, and blur metadata, staging files in
+`r2-upload/` for upload to the bucket. The gallery is bulk-managed with
+`npm run photos:gallery` (add) and `npm run photos:gallery:remove -- 5 12` (remove).
+
+**Full setup and workflow: [`docs/IMAGES.md`](docs/IMAGES.md).**
 
 ## Contact form
 
@@ -99,11 +105,22 @@ currently logs them. Wire up an email/CRM provider where marked in
 - Analytics is off by default. Set `NEXT_PUBLIC_ANALYTICS_DOMAIN` to enable a
   cookieless, Plausible-compatible script (see `.env.example`).
 
-FAQ content lives in `src/lib/site.ts` (`faqs`) — answers are placeholders;
+FAQ content lives in `src/lib/content.ts` (`getFaqs`) — answers are placeholders;
 edit them to match your real policies before launch.
 
 ## Deployment
 
-Set `NEXT_PUBLIC_SITE_URL` to the production origin (used for canonical URLs,
-Open Graph, sitemap, and robots). The site is static-first and deploys cleanly
-to Vercel or any Node host (`npm run build && npm run start`).
+Hosting is on **Vercel via its native Git integration** — every push deploys
+automatically, no tokens or secrets.
+
+| Branch | Vercel env | Domain                        |
+| ------ | ---------- | ----------------------------- |
+| `main` | Production | `carolinacreampups.com`       |
+| `dev`  | Preview    | `beta.carolinacreampups.com` (noindex) |
+
+GitHub Actions runs the `verify` check (lint/typecheck/test/build); require it via
+branch protection on `main` so production only builds from green code.
+`NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_IMAGE_BASE_URL`, and `NEXT_PUBLIC_NOINDEX`
+are set per-environment in Vercel. Full one-time setup (project import, env vars,
+domains, branch protection) is in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). The
+site also runs on any Node host via `npm run build && npm run start`.

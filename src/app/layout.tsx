@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Analytics } from "@/components/seo/Analytics";
 import { cssVariables } from "@/lib/theme";
-import { site } from "@/lib/site";
+import { noindex, site } from "@/lib/site";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -56,11 +56,13 @@ export const metadata: Metadata = {
     description: site.description,
     images: ["/og.png"],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
+  robots: noindex
+    ? { index: false, follow: false, googleBot: { index: false, follow: false } }
+    : {
+        index: true,
+        follow: true,
+        googleBot: { index: true, follow: true, "max-image-preview": "large" },
+      },
 };
 
 export const viewport: Viewport = {

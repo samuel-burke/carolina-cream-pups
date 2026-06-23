@@ -11,7 +11,12 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:assets": "node scripts/generate-placeholders.mjs && node scripts/generate-og.mjs"
+    "gen:assets": "node scripts/generate-placeholders.mjs && node scripts/generate-og.mjs",
+    "photos:catalog": "node scripts/catalog-photos.mjs",
+    "photos:dedupe": "node scripts/dedupe-photos.mjs",
+    "photos:gallery": "node scripts/process-gallery.mjs",
+    "photos:gallery:remove": "node scripts/gallery-remove.mjs",
+    "photos": "node scripts/process-photos.mjs"
   },
   "dependencies": {
     "next": "15.5.19",

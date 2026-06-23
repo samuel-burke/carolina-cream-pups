@@ -13,6 +13,8 @@ export function HomeHero({ hero }: { hero: HomeContent["hero"] }) {
         priority
         sizes="100vw"
         unoptimized={hero.image.src.endsWith(".svg")}
+        placeholder={hero.image.blurDataURL ? "blur" : "empty"}
+        blurDataURL={hero.image.blurDataURL}
         className={styles.img}
       />
       <div aria-hidden className={styles.scrim} />

@@ -50,7 +50,7 @@ describe("getAboutContent()", () => {
 describe("getParentsContent()", () => {
   it("returns parent profiles with clearances, images, and pairing points", async () => {
     const content = await getParentsContent();
-    expect(content.parents.length).toBe(2);
+    expect(content.parents.length).toBe(3);
     for (const p of content.parents) {
       expect(p.clearances.length).toBeGreaterThan(0);
       expectValidImage(p.image);

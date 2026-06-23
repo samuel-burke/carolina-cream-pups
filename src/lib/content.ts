@@ -11,7 +11,7 @@
  * To edit content TODAY (developer): change the data below. The shapes are
  * enforced by the types in content-types.ts.
  */
-import { images } from "./images";
+import { galleryImages, images } from "./images";
 import type {
   AboutContent,
   Faq,
@@ -99,7 +99,7 @@ export async function getParentsContent(): Promise<ParentsContent> {
     eyebrow: "Meet the parents",
     heading: "Our dams & sires.",
     intro:
-      "Health clearances and temperament are everything. Here's who your puppy comes from — and what these two bring together.",
+      "Health clearances and temperament are everything. Here's who your puppies come from.",
     parents: [
       {
         role: "Dam",
@@ -114,6 +114,13 @@ export async function getParentsContent(): Promise<ParentsContent> {
         description: "Temperament, weight, color, and a sentence on personality and lineage.",
         clearances,
         image: images.parentSire,
+      },
+      {
+        role: "Dam",
+        name: "Name",
+        description: "Temperament, weight, color, and a sentence on personality and lineage.",
+        clearances,
+        image: images.parentThird,
       },
     ],
     pairing: {
@@ -140,20 +147,19 @@ export async function getParentsContent(): Promise<ParentsContent> {
 export async function getGallery(): Promise<GalleryContent> {
   return {
     eyebrow: "Photo gallery",
-    heading: "Our litters, and where they are now.",
+    heading: "Our pups, and where they are now.",
     intro:
-      "Browse recent litters — and meet some of our past puppies all grown up with their families.",
+      "Browse our puppies — and meet some of our past pups all grown up with their families.",
     litter: {
-      title: "Spring 2026 litter",
-      born: "Born March 2nd",
-      images: [
-        { image: images.gallery1, ratio: "4/5" },
-        { image: images.gallery2, ratio: "1/1" },
-        { image: images.gallery3, ratio: "3/4" },
-        { image: images.gallery4, ratio: "4/3" },
-        { image: images.gallery5, ratio: "1/1" },
-        { image: images.gallery6, ratio: "3/4" },
-      ],
+      title: "Our pups",
+      born: "",
+      // Renders every gallery photo uploaded (any count); ratio comes from each
+      // photo's real dimensions so the masonry stays natural. Falls back to the
+      // placeholder grid until real gallery photos are added.
+      images: galleryImages().map((image) => ({
+        image,
+        ratio: `${image.width}/${image.height}`,
+      })),
     },
     alumni: {
       eyebrow: "Where they are now",

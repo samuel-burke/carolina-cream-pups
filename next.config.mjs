@@ -1,11 +1,18 @@
+// Allow next/image to optimize photos served from the image CDN (Cloudflare R2
+// or any host), derived from NEXT_PUBLIC_IMAGE_BASE_URL so nothing is hardcoded.
+// Unset = images load locally from /public/images (placeholders / dev).
+const imageBase = process.env.NEXT_PUBLIC_IMAGE_BASE_URL;
+const remotePatterns = imageBase
+  ? [{ protocol: new URL(imageBase).protocol.replace(":", ""), hostname: new URL(imageBase).hostname }]
+  : [];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // Images are served from /public for now (see src/lib/images.ts). When real
-  // assets move to a CDN, add the host here and switch ImageBox to next/image.
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns,
   },
   async headers() {
     return [

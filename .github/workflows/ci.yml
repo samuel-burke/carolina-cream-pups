@@ -37,3 +37,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_SITE_URL: https://carolinacreampups.com
+
+# Deployment is handled by Vercel's native Git integration (connect the repo in
+# the Vercel dashboard) — no deploy job here. Require this `verify` check via
+# branch protection on `main` so production only builds from green code.

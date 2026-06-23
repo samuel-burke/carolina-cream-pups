@@ -22,6 +22,7 @@ const C = {
   surface: "#F5EFE6",
   text: "#3A352E",
   sage: "#8A9A85",
+  sageDeep: "#6E7E69",
   taupe: "#B7A892",
   on: "#FFFDF8",
 };
@@ -50,13 +51,17 @@ function ogSvg() {
 }
 
 function iconSvg(size) {
-  const r = Math.round(size * 0.22);
+  // Cream tile + solid sage paw (matches src/app/icon.svg). The tile keeps the
+  // Apple/PWA/maskable icons from rendering transparent-on-black.
+  const r = Math.round((size * 0.22 * 64) / size);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="${(r / size) * 64}" fill="${C.sage}"/>
-  <g fill="${C.on}">
-    <circle cx="22" cy="24" r="6"/><circle cx="42" cy="24" r="6"/>
-    <circle cx="15" cy="36" r="5"/><circle cx="49" cy="36" r="5"/>
-    <path d="M32 32c-7 0-13 5-13 11 0 5 4 8 9 8 2 0 3-1 4-1s2 1 4 1c5 0 9-3 9-8 0-6-6-11-13-11z"/>
+  <rect width="64" height="64" rx="${r}" fill="${C.bg}"/>
+  <g fill="${C.sageDeep}">
+    <ellipse cx="25" cy="18" rx="7" ry="9.6" transform="rotate(-10 25 18)"/>
+    <ellipse cx="39" cy="18" rx="7" ry="9.6" transform="rotate(10 39 18)"/>
+    <ellipse cx="12.5" cy="30.5" rx="6.6" ry="9" transform="rotate(-30 12.5 30.5)"/>
+    <ellipse cx="51.5" cy="30.5" rx="6.6" ry="9" transform="rotate(30 51.5 30.5)"/>
+    <path d="M32 29c-7 0-13 7-15.5 14C14 49.5 17 58 24 58c4 0 6-2.5 8-2.5s4 2.5 8 2.5c7 0 10-8.5 7.5-15C45 36 39 29 32 29z"/>
   </g>
 </svg>`;
 }
