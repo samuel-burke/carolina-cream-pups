@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "gen:assets": "node scripts/generate-placeholders.mjs && node scripts/generate-og.mjs",
     "photos:catalog": "node scripts/catalog-photos.mjs",
+    "photos:dedupe": "node scripts/dedupe-photos.mjs",
     "photos": "node scripts/process-photos.mjs"
   },
   "dependencies": {

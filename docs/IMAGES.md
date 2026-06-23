@@ -47,6 +47,21 @@ Two ways — pick whichever you prefer:
    switches to its real photo automatically — no manifest edits. (Optionally tidy
    the `alt` text in `src/lib/images.ts`.)
 
+### Cleaning up duplicate sizes (optional)
+
+You don't need this for the website — the pipeline already ignores WordPress size
+variants. But to physically delete the duplicates from a folder (reclaim disk),
+run the safe deduper (dry-run by default):
+
+```bash
+npm run photos:dedupe -- photos-src            # preview what would be removed
+npm run photos:dedupe -- photos-src --delete   # actually delete
+```
+
+It keeps the largest original of each photo and removes `-WxH`/`-scaled`
+variants and `elementor`/`thumbs` caches. Work on a copy or keep a backup before
+using `--delete`.
+
 ### B. Drag-drop straight to R2 (simplest, no local tooling)
 
 Upload images named after their slots (`hero.jpg`, `puppy-willow.jpg`, …) directly
