@@ -140,12 +140,12 @@ export async function getParentsContent(): Promise<ParentsContent> {
 export async function getGallery(): Promise<GalleryContent> {
   return {
     eyebrow: "Photo gallery",
-    heading: "Our litters, and where they are now.",
+    heading: "Our pups, and where they are now.",
     intro:
-      "Browse recent litters — and meet some of our past puppies all grown up with their families.",
+      "Browse our puppies — and meet some of our past pups all grown up with their families.",
     litter: {
-      title: "Spring 2026 litter",
-      born: "Born March 2nd",
+      title: "Our pups",
+      born: "",
       // Renders every gallery photo uploaded (any count); ratio comes from each
       // photo's real dimensions so the masonry stays natural. Falls back to the
       // placeholder grid until real gallery photos are added.
