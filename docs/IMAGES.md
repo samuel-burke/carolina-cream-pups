@@ -62,6 +62,28 @@ them in one command (no per-photo mapping):
 Re-running replaces the gallery set, so prefix filenames (`01-`, `02-`, …) if you
 want to control the order.
 
+#### Removing / re-curating gallery photos
+
+The gallery shows whatever `gallery-<n>.jpg` entries exist in the metadata, so
+removal is metadata-driven.
+
+- **Drop a few photos:** find their numbers in the gallery, then
+  ```bash
+  npm run photos:gallery:remove -- 5 12 27
+  git add src/lib/image-meta.generated.json && git commit -m "Remove gallery photos" && git push
+  ```
+  Gaps are fine — the gallery sorts the remaining numbers. The image left on R2 is
+  harmless; to delete it too: `rclone deletefile r2:carolina-cream-pups/gallery-5.jpg`.
+
+- **Re-curate in bulk:** change which photos are in `gallery-src/`, re-run
+  `npm run photos:gallery` (it clears and renumbers `gallery-*` from the folder),
+  `rclone copy r2-upload/ r2:carolina-cream-pups`, then commit the metadata. Files
+  from a previous larger run become harmless orphans on R2.
+
+> ⚠️ Don't run `rclone sync` against the bucket **root** — named-slot files
+> (`hero.jpg`, …) live there too, and a sync from a gallery-only `r2-upload/`
+> would delete them. Use `rclone copy` (adds/updates only).
+
 ### Cleaning up duplicate sizes (optional)
 
 You don't need this for the website — the pipeline already ignores WordPress size

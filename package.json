@@ -15,6 +15,7 @@
     "photos:catalog": "node scripts/catalog-photos.mjs",
     "photos:dedupe": "node scripts/dedupe-photos.mjs",
     "photos:gallery": "node scripts/process-gallery.mjs",
+    "photos:gallery:remove": "node scripts/gallery-remove.mjs",
     "photos": "node scripts/process-photos.mjs"
   },
   "dependencies": {

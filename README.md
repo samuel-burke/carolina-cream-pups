@@ -85,7 +85,8 @@ run the pipeline, upload, commit the metadata, and each slot switches itself.
 
 The pipeline (`npm run photos:catalog` → fill `photos.map.json` → `npm run photos`)
 handles WordPress dumps, sizing, compression, and blur metadata, staging files in
-`r2-upload/` for upload to the bucket.
+`r2-upload/` for upload to the bucket. The gallery is bulk-managed with
+`npm run photos:gallery` (add) and `npm run photos:gallery:remove -- 5 12` (remove).
 
 **Full setup and workflow: [`docs/IMAGES.md`](docs/IMAGES.md).**
 
