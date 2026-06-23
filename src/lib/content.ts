@@ -20,6 +20,7 @@ import type {
   LitterStatus,
   ParentsContent,
   ReserveContent,
+  TestimonialsContent,
 } from "./content-types";
 
 export async function getHomeContent(): Promise<HomeContent> {
@@ -204,6 +205,45 @@ export async function getReserve(): Promise<ReserveContent> {
         note: "Next openings expected with the summer litter.",
       },
     },
+  };
+}
+
+export async function getTestimonials(): Promise<TestimonialsContent> {
+  return {
+    eyebrow: "Testimonials",
+    heading: "Families who chose us.",
+    intro:
+      "A few words from the homes our puppies have joined. Replace these with real notes from your families.",
+    items: [
+      {
+        quote:
+          "From our first call to pick-up day, everything was thoughtful and unhurried. Our puppy came home calm, healthy, and already so confident around our kids.",
+        name: "The Harrisons",
+        location: "Raleigh, NC",
+        rating: 5,
+      },
+      {
+        quote:
+          "You can tell these dogs are raised underfoot, not in a kennel. The socialization showed immediately — crate training was nearly done for us.",
+        name: "Megan & Tyler",
+        location: "Charlotte, NC",
+        rating: 5,
+      },
+      {
+        quote:
+          "Health testing, clear communication, and lifetime support that's actually real. We'll be back for our second from them.",
+        name: "The Bennetts",
+        location: "Wilmington, NC",
+        rating: 5,
+      },
+      {
+        quote:
+          "Our girl is now a certified therapy dog. The temperament she came with made all the difference — exactly what they promised.",
+        name: "Dana P.",
+        location: "the Outer Banks",
+        rating: 5,
+      },
+    ],
   };
 }
 

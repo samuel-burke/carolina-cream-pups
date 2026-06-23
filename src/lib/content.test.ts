@@ -10,6 +10,7 @@ import {
   getReserve,
   getLitterStatus,
   getParentsContent,
+  getTestimonials,
 } from "./content";
 
 const PUBLIC = join(process.cwd(), "public");
@@ -91,6 +92,21 @@ describe("getGallery()", () => {
     for (const { image } of gallery.litter.images) expectValidImage(image);
     expect(gallery.alumni.members.length).toBeGreaterThan(0);
     for (const m of gallery.alumni.members) expectValidImage(m.image);
+  });
+});
+
+describe("getTestimonials()", () => {
+  it("returns non-empty quotes with names and valid ratings", async () => {
+    const t = await getTestimonials();
+    expect(t.items.length).toBeGreaterThan(0);
+    for (const item of t.items) {
+      expect(item.quote.trim().length).toBeGreaterThan(0);
+      expect(item.name.trim().length).toBeGreaterThan(0);
+      if (item.rating !== undefined) {
+        expect(item.rating).toBeGreaterThanOrEqual(1);
+        expect(item.rating).toBeLessThanOrEqual(5);
+      }
+    }
   });
 });
 

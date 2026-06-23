@@ -47,6 +47,21 @@ export type ReserveContent = {
   waitlists: { male: Waitlist; female: Waitlist };
 };
 
+export type Testimonial = {
+  quote: string;
+  name: string;
+  location?: string;
+  /** 1–5; omit if you don't want a star rating shown. */
+  rating?: number;
+};
+
+export type TestimonialsContent = {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  items: Testimonial[];
+};
+
 export type Faq = { question: string; answer: string };
 
 /** A title + body + image row (home differentiators). */
