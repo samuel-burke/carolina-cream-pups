@@ -27,8 +27,8 @@ export default async function ParentsPage() {
       </Section>
 
       <Section flushTop>
-        {content.parents.map((p) => (
-          <ParentProfile key={p.role} {...p} />
+        {content.parents.map((p, i) => (
+          <ParentProfile key={`${p.role}-${i}`} {...p} />
         ))}
       </Section>
 
@@ -47,6 +47,43 @@ export default async function ParentsPage() {
               </Text>
             </div>
           ))}
+        </Grid>
+      </Section>
+
+      {/* Health testing & ethics — verifiable proof */}
+      <Section>
+        <Eyebrow>{content.health.eyebrow}</Eyebrow>
+        <Heading level={2} style={{ maxWidth: 640 }}>
+          {content.health.heading}
+        </Heading>
+        <Text muted style={{ marginTop: "1rem", maxWidth: 620 }}>
+          {content.health.body}
+        </Text>
+        <Grid cols={2} gap={4} style={{ marginTop: "2rem", alignItems: "start" }}>
+          <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            {content.health.standards.map((s) => (
+              <li key={s}>
+                <Text as="span">{s}</Text>
+              </li>
+            ))}
+          </ul>
+          <div>
+            <Text style={{ fontWeight: 600 }}>Verify our dogs</Text>
+            <ul style={{ listStyle: "none", margin: "0.5rem 0 0", padding: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              {content.health.links.map((l) => (
+                <li key={l.href}>
+                  <a
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "var(--color-sage-deep)", fontWeight: 600, borderBottom: "1px solid var(--color-sage)" }}
+                  >
+                    {l.label} →
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </Grid>
       </Section>
     </>

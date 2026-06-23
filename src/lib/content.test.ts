@@ -54,9 +54,21 @@ describe("getParentsContent()", () => {
     expect(content.parents.length).toBe(3);
     for (const p of content.parents) {
       expect(p.clearances.length).toBeGreaterThan(0);
+      for (const c of p.clearances) {
+        expect(c.test.trim().length).toBeGreaterThan(0);
+        expect(c.result.trim().length).toBeGreaterThan(0);
+      }
       expectValidImage(p.image);
     }
     expect(content.pairing.points.length).toBeGreaterThan(0);
+
+    // Health-transparency block: testing standards + verifiable database links.
+    expect(content.health.standards.length).toBeGreaterThan(0);
+    expect(content.health.links.length).toBeGreaterThan(0);
+    for (const l of content.health.links) {
+      expect(l.label.trim().length).toBeGreaterThan(0);
+      expect(l.href.startsWith("http")).toBe(true);
+    }
   });
 });
 

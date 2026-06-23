@@ -98,32 +98,54 @@ export async function getAboutContent(): Promise<AboutContent> {
 }
 
 export async function getParentsContent(): Promise<ParentsContent> {
-  const clearances = ["OFA Hips", "Elbows", "Heart", "Eyes", "Genetic Panel"];
+  // Placeholder clearances — replace each result, CHIC #, registered name, and
+  // verifyUrl with this dog's real OFA/CHIC record before launch.
+  const clearances = [
+    { test: "Hips", result: "OFA Good" },
+    { test: "Elbows", result: "OFA Normal" },
+    { test: "Heart", result: "Normal — Advanced Cardiac (cardiologist)" },
+    { test: "Eyes", result: "Normal — CAER" },
+    { test: "prcd-PRA", result: "Clear" },
+    { test: "Ichthyosis (ICT-A)", result: "Clear" },
+    { test: "DM", result: "Clear" },
+  ];
   return {
     eyebrow: "Meet the parents",
     heading: "Our dams & sires.",
     intro:
-      "Health clearances and temperament are everything. Here's who your puppies come from.",
+      "Health clearances and temperament are everything. Every result below is verifiable in the public OFA/CHIC databases — here's who your puppies come from.",
     parents: [
       {
         role: "Dam",
         name: "Name",
+        registeredName: "AKC registered name",
+        chicNumber: "Add CHIC #",
+        verifyUrl: "https://ofa.org/advanced-search/",
         description: "Temperament, weight, color, and a sentence on personality and lineage.",
         clearances,
+        titles: ["AKC Canine Good Citizen"],
         image: images.parentDam,
       },
       {
         role: "Sire",
         name: "Name",
+        registeredName: "AKC registered name",
+        chicNumber: "Add CHIC #",
+        verifyUrl: "https://ofa.org/advanced-search/",
         description: "Temperament, weight, color, and a sentence on personality and lineage.",
         clearances,
+        titles: ["AKC Canine Good Citizen"],
         image: images.parentSire,
       },
       {
         role: "Dam",
         name: "Name",
+        registeredName: "AKC registered name",
+        chicNumber: "Add CHIC #",
+        verifyUrl: "https://ofa.org/advanced-search/",
         description: "Temperament, weight, color, and a sentence on personality and lineage.",
         clearances,
+        titles: ["AKC Canine Good Citizen"],
         image: images.parentThird,
       },
     ],
@@ -143,6 +165,23 @@ export async function getParentsContent(): Promise<ParentsContent> {
           title: "Health depth",
           body: "Generations of cleared lines behind both parents, not just the parents themselves.",
         },
+      ],
+    },
+    health: {
+      eyebrow: "Health testing & ethics",
+      heading: "Every breeding dog is fully health tested — and you can verify it.",
+      body: "We test to the standards recommended for Golden Retrievers before any dog is bred, and we publish the results so you never have to take our word for it. Look up any of our dogs by name or CHIC number in the public databases below.",
+      standards: [
+        "Hips & elbows — OFA evaluated",
+        "Heart — OFA Advanced Cardiac, by a board-certified cardiologist",
+        "Eyes — annual OFA/CAER exam",
+        "Genetic panel — prcd-PRA, PRA1/PRA2, Ichthyosis, DM and more",
+        "CHIC number issued once all required tests are on file",
+      ],
+      links: [
+        { label: "OFA database (ofa.org)", href: "https://ofa.org/advanced-search/" },
+        { label: "About CHIC", href: "https://ofa.org/about/chic-program/" },
+        { label: "AKC", href: "https://www.akc.org/" },
       ],
     },
   };
