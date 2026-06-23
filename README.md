@@ -100,10 +100,11 @@ currently logs them. Wire up an email/CRM provider where marked in
 
 - Per-page metadata, canonical URLs, Open Graph + Twitter cards, and a generated
   `og.png` social image.
-- Structured data: `LocalBusiness` (site-wide), `BreadcrumbList` (subpages), and
-  `FAQPage` (Reserve page). Sitemap and robots are generated from the nav config.
-- Analytics is off by default. Set `NEXT_PUBLIC_ANALYTICS_DOMAIN` to enable a
-  cookieless, Plausible-compatible script (see `.env.example`).
+- Structured data: `LocalBusiness` (site-wide), `BreadcrumbList` (subpages),
+  `FAQPage` (Reserve page), and `Review`/`AggregateRating` (Testimonials page).
+  Sitemap and robots are generated from the nav config.
+- Analytics: Vercel Web Analytics (`@vercel/analytics`), enabled from the Vercel
+  dashboard — no env var or third-party script to configure.
 
 FAQ content lives in `src/lib/content.ts` (`getFaqs`) — answers are placeholders;
 edit them to match your real policies before launch.
