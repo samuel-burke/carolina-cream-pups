@@ -99,7 +99,7 @@ export async function getParentsContent(): Promise<ParentsContent> {
     eyebrow: "Meet the parents",
     heading: "Our dams & sires.",
     intro:
-      "Health clearances and temperament are everything. Here's who your puppy comes from — and what these two bring together.",
+      "Health clearances and temperament are everything. Here's who your puppies come from.",
     parents: [
       {
         role: "Dam",
@@ -114,6 +114,13 @@ export async function getParentsContent(): Promise<ParentsContent> {
         description: "Temperament, weight, color, and a sentence on personality and lineage.",
         clearances,
         image: images.parentSire,
+      },
+      {
+        role: "Dam",
+        name: "Name",
+        description: "Temperament, weight, color, and a sentence on personality and lineage.",
+        clearances,
+        image: images.parentThird,
       },
     ],
     pairing: {

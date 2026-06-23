@@ -55,6 +55,7 @@ export const images = {
   aboutPortrait: slot("about-portrait", "Portrait of the breeder at home with the dogs", 800, 1066),
   parentDam: slot("parent-dam", "Our dam, a light English Cream Golden Retriever", 800, 1000),
   parentSire: slot("parent-sire", "Our sire, a cream English Golden Retriever", 800, 1000),
+  parentThird: slot("parent-3", "A third English Cream Golden Retriever parent", 800, 1000),
   puppyBiscuit: slot("puppy-biscuit", "Biscuit, a male cream golden retriever puppy", 800, 1000),
   puppyWillow: slot("puppy-willow", "Willow, a female light gold golden retriever puppy", 800, 1000),
   puppySailor: slot("puppy-sailor", "Sailor, a male cream golden retriever puppy", 800, 1000),
