@@ -31,6 +31,9 @@ next-env.d.ts
 # vercel
 .vercel
 
+# raw photo originals — only the optimized /public/images outputs are committed
+/photos-src
+
 # editor
 .vscode/*
 !.vscode/extensions.json

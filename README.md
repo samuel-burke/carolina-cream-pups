@@ -73,16 +73,30 @@ Stable, non-editable config (brand/business info, navigation, SEO) stays in
 
 ## Images
 
-Every image is registered in `src/lib/images.ts` with its `src`, `alt`, and
-intrinsic dimensions. The current files in `public/images` are generated,
-on-brand placeholders. To use real photos:
+Every image is registered in `src/lib/images.ts` (semantic key → filename +
+`alt`). Images render through `next/image` (via `ImageBox`), which lazy-loads,
+serves responsive AVIF/WebP, and shows a blur-up placeholder. Only the hero is
+`priority`; everything else is lazy.
 
-1. Drop the real file into `public/images` using the same filename, **or**
-2. Point the entry's `src` at a CDN URL (and add the host to
-   `images.remotePatterns` in `next.config.mjs`).
+### Adding real photos (fast path)
 
-Update each `alt` to describe the real photo. Then delete
-`scripts/generate-placeholders.mjs` once placeholders are no longer needed.
+A pipeline handles sizing, compression, dimensions, and blur previews for you:
+
+1. Put originals in a `photos-src/` folder (gitignored — only the optimized
+   outputs are committed), named after the slot they fill, e.g. `hero.jpg`,
+   `puppy-biscuit.jpg`, `gallery-1.jpg`. The slot names are the filenames in
+   `src/lib/images.ts`. (Export HEIC to JPEG first — HEIC isn't supported.)
+2. Run `npm run photos`. This downscales to a 2000px max edge, strips EXIF,
+   compresses (mozjpeg), writes `public/images/<name>.jpg`, and records each
+   image's real width/height + `blurDataURL` in `image-meta.generated.json`.
+3. In `src/lib/images.ts`, point the relevant entries' `src` at the new `.jpg`
+   filename and update `alt` to describe the photo. (Dimensions and blur are
+   merged automatically from the generated metadata.)
+4. `npm run build`. Commit the optimized files in `public/images` and the
+   updated manifest/metadata.
+
+Alternatively, host on an external CDN and set the entry's `src` to a full URL
+(add the host to `images.remotePatterns` in `next.config.mjs`).
 
 ## Contact form
 

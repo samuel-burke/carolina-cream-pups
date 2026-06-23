@@ -53,6 +53,8 @@ export function ImageBox({
         sizes={sizes}
         priority={priority}
         unoptimized={isSvg}
+        placeholder={image.blurDataURL ? "blur" : "empty"}
+        blurDataURL={image.blurDataURL}
         className={styles.img}
       />
     </div>
