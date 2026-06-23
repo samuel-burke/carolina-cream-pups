@@ -19,6 +19,13 @@ import metaJson from "./image-meta.generated.json";
 type ImageMeta = { width: number; height: number; blurDataURL: string };
 const meta = metaJson as Record<string, ImageMeta>;
 
+/**
+ * CDN origin for real photos (e.g. https://images.carolinacreampups.com,
+ * a Cloudflare R2 public bucket). Set via NEXT_PUBLIC_IMAGE_BASE_URL. When
+ * unset, `photo()` falls back to /public/images so dev/CI still works.
+ */
+const base = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL ?? "").replace(/\/+$/, "");
+
 export type ImageAsset = {
   src: string;
   alt: string;
@@ -28,16 +35,23 @@ export type ImageAsset = {
   blurDataURL?: string;
 };
 
-const img = (file: string, alt: string, width: number, height: number): ImageAsset => {
+const withMeta = (file: string, src: string, alt: string, width: number, height: number): ImageAsset => {
   const m = meta[file];
-  return {
-    src: `/images/${file}`,
-    alt,
-    width: m?.width ?? width,
-    height: m?.height ?? height,
-    blurDataURL: m?.blurDataURL,
-  };
+  return { src, alt, width: m?.width ?? width, height: m?.height ?? height, blurDataURL: m?.blurDataURL };
 };
+
+/** Local asset in /public/images — used for the SVG placeholders. */
+const img = (file: string, alt: string, width: number, height: number): ImageAsset =>
+  withMeta(file, `/images/${file}`, alt, width, height);
+
+/**
+ * Real photo hosted on the image CDN. Once a photo is uploaded to the bucket,
+ * switch a slot from `img("…​.svg", …)` to `photo("…​.jpg", …)`. Dimensions and
+ * the blur placeholder come from image-meta.generated.json (produced by
+ * `npm run photos`).
+ */
+export const photo = (file: string, alt: string, width: number, height: number): ImageAsset =>
+  withMeta(file, base ? `${base}/${file}` : `/images/${file}`, alt, width, height);
 
 export const images = {
   heroHome: img(

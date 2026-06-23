@@ -27,7 +27,9 @@ import { scanOriginals } from "./scan-photos.mjs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const SRC = join(ROOT, "photos-src");
-const OUT = join(ROOT, "public", "images");
+// Optimized masters go here, then get uploaded to the image CDN (R2). This
+// folder is gitignored — photos live on the CDN, not in the repo.
+const OUT = join(ROOT, "r2-upload");
 const META = join(ROOT, "src", "lib", "image-meta.generated.json");
 const MAP = join(ROOT, "photos.map.json");
 const CATALOG_INDEX = join(ROOT, "photo-catalog", "index.json");
@@ -98,5 +100,7 @@ for (const { slot, path } of jobs) {
 }
 
 await writeFile(META, JSON.stringify(meta, null, 2) + "\n");
-console.log(`\nProcessed ${jobs.length} photo(s) into public/images.`);
-console.log(`If any output names differ from the manifest, update src/lib/images.ts 'src' + 'alt'.`);
+console.log(`\nProcessed ${jobs.length} photo(s) into r2-upload/.`);
+console.log(`Next: upload r2-upload/*.jpg to your R2 bucket, then in src/lib/images.ts
+switch each migrated slot from img("…​.svg", …) to photo("…​.jpg", …) and set alt.
+The dimensions + blur placeholder are already recorded in image-meta.generated.json.`);

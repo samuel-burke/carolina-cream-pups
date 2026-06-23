@@ -35,6 +35,8 @@ next-env.d.ts
 /photos-src
 # generated contact sheets for mapping photos to slots
 /photo-catalog
+# optimized photos staged for upload to the image CDN (R2)
+/r2-upload
 
 # editor
 .vscode/*

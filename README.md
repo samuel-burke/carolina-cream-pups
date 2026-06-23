@@ -73,50 +73,20 @@ Stable, non-editable config (brand/business info, navigation, SEO) stays in
 
 ## Images
 
-Every image is registered in `src/lib/images.ts` (semantic key → filename +
-`alt`). Images render through `next/image` (via `ImageBox`), which lazy-loads,
-serves responsive AVIF/WebP, and shows a blur-up placeholder. Only the hero is
-`priority`; everything else is lazy.
+Real photos are hosted on a **Cloudflare R2 CDN** (not in git) and served via
+`next/image` (`ImageBox`), which lazy-loads, serves responsive AVIF/WebP, and
+shows a blur-up placeholder. Only the hero is `priority`; everything else is lazy.
 
-### Adding real photos (fast path)
+Each slot is registered in `src/lib/images.ts` as either a local placeholder
+(`img("hero.svg", …)`) or a CDN photo (`photo("hero.jpg", …)`). The CDN origin
+comes from `NEXT_PUBLIC_IMAGE_BASE_URL`; when unset, everything falls back to
+`/public/images` so dev/CI work without the CDN.
 
-A pipeline handles sizing, compression, dimensions, and blur previews for you:
+The optimization pipeline (`npm run photos:catalog` → map → `npm run photos`)
+handles WordPress dumps, sizing, compression, and blur metadata, staging files in
+`r2-upload/` for upload to the bucket.
 
-1. Put originals in a `photos-src/` folder (gitignored — only the optimized
-   outputs are committed), named after the slot they fill, e.g. `hero.jpg`,
-   `puppy-biscuit.jpg`, `gallery-1.jpg`. The slot names are the filenames in
-   `src/lib/images.ts`. (Export HEIC to JPEG first — HEIC isn't supported.)
-2. Run `npm run photos`. This downscales to a 2000px max edge, strips EXIF,
-   compresses (mozjpeg), writes `public/images/<name>.jpg`, and records each
-   image's real width/height + `blurDataURL` in `image-meta.generated.json`.
-3. In `src/lib/images.ts`, point the relevant entries' `src` at the new `.jpg`
-   filename and update `alt` to describe the photo. (Dimensions and blur are
-   merged automatically from the generated metadata.)
-4. `npm run build`. Commit the optimized files in `public/images` and the
-   updated manifest/metadata.
-
-### Adding photos from a raw dump (e.g. a WordPress export)
-
-If your photos are a folder tree (e.g. `wp-content/uploads/2024/10/…`), don't
-clean it up by hand:
-
-1. Drop the whole tree into `photos-src/`. The scanner (`scripts/scan-photos.mjs`)
-   recurses and automatically ignores `elementor`/`thumbs` caches and WordPress
-   size-variants (`-300x200`, `-scaled`, …), keeping only the largest original of
-   each image.
-2. Run `npm run photos:catalog` → generates numbered contact sheets in
-   `photo-catalog/` (gitignored) plus `index.json`. Open the sheets to see every
-   candidate photo with its number.
-3. Create `photos.map.json` mapping each slot to a catalog number (or a path),
-   e.g. `{ "hero": 7, "puppy-willow": 12, "gallery-1": 3 }`.
-4. Run `npm run photos` → optimizes only the mapped photos into
-   `public/images/<slot>.jpg` with dimensions + blur metadata.
-5. The output filenames already match the slot keys, so update `alt` text in
-   `src/lib/images.ts` (and any `src` still pointing at a `.svg`), then
-   `npm run build` and commit.
-
-Alternatively, host on an external CDN and set the entry's `src` to a full URL
-(add the host to `images.remotePatterns` in `next.config.mjs`).
+**Full setup and workflow: [`docs/IMAGES.md`](docs/IMAGES.md).**
 
 ## Contact form
 
