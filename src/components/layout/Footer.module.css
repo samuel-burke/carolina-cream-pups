@@ -3,6 +3,12 @@
   color: var(--color-bg);
   padding: 2.5rem 0 1.75rem;
 }
+/* Leave room for the fixed mobile CTA bar so it never covers the footer. */
+@media (max-width: 767px) {
+  .footer {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}
 
 .inner {
   display: flex;
