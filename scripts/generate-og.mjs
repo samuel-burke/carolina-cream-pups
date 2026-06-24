@@ -11,11 +11,14 @@
  */
 import sharp from "sharp";
 import { mkdir, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
+// Brand icon (the favicon). App icons are derived from this by resizing.
+const ICON_SRC = join(ROOT, "src", "app", "icon.png");
 
 const C = {
   bg: "#FAF7F2",
@@ -50,24 +53,8 @@ function ogSvg() {
 </svg>`;
 }
 
-function iconSvg(size) {
-  // Cream tile + solid sage paw (matches src/app/icon.svg). The tile keeps the
-  // Apple/PWA/maskable icons from rendering transparent-on-black.
-  const r = Math.round((size * 0.22 * 64) / size);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="${r}" fill="${C.bg}"/>
-  <g fill="${C.sageDeep}">
-    <ellipse cx="25" cy="18" rx="7" ry="9.6" transform="rotate(-10 25 18)"/>
-    <ellipse cx="39" cy="18" rx="7" ry="9.6" transform="rotate(10 39 18)"/>
-    <ellipse cx="12.5" cy="30.5" rx="6.6" ry="9" transform="rotate(-30 12.5 30.5)"/>
-    <ellipse cx="51.5" cy="30.5" rx="6.6" ry="9" transform="rotate(30 51.5 30.5)"/>
-    <path d="M32 29c-7 0-13 7-15.5 14C14 49.5 17 58 24 58c4 0 6-2.5 8-2.5s4 2.5 8 2.5c7 0 10-8.5 7.5-15C45 36 39 29 32 29z"/>
-  </g>
-</svg>`;
-}
-
-async function png(svg, size, out) {
-  const buf = await sharp(Buffer.from(svg)).resize(size, size).png().toBuffer();
+async function iconFromSource(size, out) {
+  const buf = await sharp(ICON_SRC).resize(size, size).png().toBuffer();
   await writeFile(out, buf);
 }
 
@@ -79,9 +66,14 @@ await writeFile(
   await sharp(Buffer.from(ogSvg())).png().toBuffer(),
 );
 
-// Icons
-await png(iconSvg(192), 192, join(ROOT, "public", "icon-192.png"));
-await png(iconSvg(512), 512, join(ROOT, "public", "icon-512.png"));
-await png(iconSvg(180), 180, join(ROOT, "src", "app", "apple-icon.png"));
+// App icons — derived from the brand icon (src/app/icon.png) so re-running this
+// never reverts the favicon. icon-512 is the canonical source size.
+if (existsSync(ICON_SRC)) {
+  await iconFromSource(512, join(ROOT, "public", "icon-512.png"));
+  await iconFromSource(192, join(ROOT, "public", "icon-192.png"));
+  await iconFromSource(180, join(ROOT, "src", "app", "apple-icon.png"));
+} else {
+  console.warn("Skipped icons: src/app/icon.png not found.");
+}
 
 console.log("Generated og.png, icon-192/512.png, apple-icon.png");
