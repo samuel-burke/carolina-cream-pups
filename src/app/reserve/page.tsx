@@ -3,6 +3,7 @@ import { Section, Grid, Eyebrow, Heading, Text, Button, Card, ImageBox, Steps } 
 import { WaitlistCard } from "@/components/sections/WaitlistCard";
 import { Faq } from "@/components/sections/Faq";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { FaqJsonLd } from "@/components/seo/FaqJsonLd";
 import { getFaqs, getReserve } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default async function ReservePage() {
   return (
     <>
       <Breadcrumbs href="/reserve" />
+      <FaqJsonLd faqs={faqs} />
       <Section>
         <Eyebrow>Reserve a puppy</Eyebrow>
         <Heading level={1}>Join the waitlist.</Heading>
