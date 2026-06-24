@@ -27,6 +27,14 @@
   margin-top: 0.5rem;
 }
 
+.socials {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  font-family: var(--font-body);
+  font-size: var(--size-sm);
+}
+
 .links {
   display: flex;
   flex-wrap: wrap;
