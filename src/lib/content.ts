@@ -170,7 +170,7 @@ export async function getParentsContent(): Promise<ParentsContent> {
     health: {
       eyebrow: "Health testing & ethics",
       heading: "Every breeding dog is fully health tested — and you can verify it.",
-      body: "We test to the standards recommended for Golden Retrievers before any dog is bred, and we publish the results so you never have to take our word for it. Look up any of our dogs by name or CHIC number in the public databases below.",
+      body: "We test to the standards recommended for Golden Retrievers before any dog is bred, and we publish the results so you never have to take our word for it. Look up any of our dogs by name or CHIC number in the public databases below — and every puppy goes home with a one-year genetic health guarantee.",
       standards: [
         "Hips & elbows — OFA evaluated",
         "Heart — OFA Advanced Cardiac, by a board-certified cardiologist",
@@ -398,7 +398,7 @@ export async function getFaqs(): Promise<Faq[]> {
     {
       question: "Do you offer a health guarantee?",
       answer:
-        "Describe your health guarantee here — what it covers, for how long, and what's expected of you in return (vet visits, diet). This is a key trust signal for buyers.",
+        "Yes — every puppy comes with a one-year genetic health guarantee covering serious hereditary or congenital conditions. (Add your exact terms here: what's covered, what's expected of you — a vet check within a few days, keeping up vaccinations/diet — and how a claim is handled.)",
     },
     {
       question: "Do you ship puppies or is pickup required?",
