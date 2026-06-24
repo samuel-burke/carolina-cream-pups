@@ -17,6 +17,7 @@ import type {
   AboutContent,
   Faq,
   GalleryContent,
+  GoingHomeContent,
   HomeContent,
   LitterStatus,
   ParentsContent,
@@ -93,6 +94,77 @@ export async function getAboutContent(): Promise<AboutContent> {
         { head: "Weeks 5–7 · Training", body: "Come, sit, leash, crate time, and lots of calm affection." },
         { head: "Week 8 · Vet & home", body: "First vaccines, deworming, vet check — ready to go home." },
       ],
+    },
+  };
+}
+
+export async function getGoingHomeContent(): Promise<GoingHomeContent> {
+  return {
+    eyebrow: "Going home",
+    heading: "What comes home with your puppy — and how to be ready.",
+    intro:
+      "Bringing a puppy home is a big day. Here's exactly what your puppy leaves with, what to have ready before pickup, and how we support you through the first weeks and beyond.",
+    included: {
+      eyebrow: "What's included",
+      heading: "Every puppy goes home at eight weeks with:",
+      items: [
+        {
+          title: "Vet check & vaccinations",
+          body: "A full vet health exam, age-appropriate vaccinations, and deworming — with records you can hand straight to your own vet.",
+        },
+        {
+          title: "Microchip",
+          body: "Registered and ready to update to your contact details, so your puppy can always find its way home.",
+        },
+        {
+          title: "AKC registration paperwork",
+          body: "Registration application and your puppy's pedigree, plus a copy of the parents' health clearances.",
+        },
+        {
+          title: "One-year genetic health guarantee",
+          body: "Written coverage for serious hereditary or congenital conditions. (See the full terms in your sales agreement.)",
+        },
+        {
+          title: "Go-home starter kit",
+          body: "A bag of the food your puppy is already eating, a blanket that smells like home and littermates, and a favorite toy.",
+        },
+        {
+          title: "Puppy Culture head start",
+          body: "Eight weeks of socialization, early potty and crate work, and gentle handling — so your puppy arrives confident and ready to learn.",
+        },
+      ],
+    },
+    prepare: {
+      eyebrow: "Before pickup",
+      heading: "A short list to have ready at home.",
+      body: "You don't need much — just the basics, set up before your puppy walks in the door so the first day is calm.",
+      steps: [
+        { head: "A safe space", body: "A crate and a small gated area for naps, meals, and downtime." },
+        { head: "Food & bowls", body: "We'll tell you the exact food; keep them on it to start, then transition slowly." },
+        { head: "Potty plan", body: "Pick a potty spot and a schedule. Young puppies go out often — and right after meals and naps." },
+        { head: "Vet appointment", body: "Book a wellness visit within the first few days, as the health guarantee asks." },
+      ],
+    },
+    firstDays: {
+      eyebrow: "The first days home",
+      heading: "Go slow, keep it calm, and let your puppy settle.",
+      paragraphs: [
+        "The first few days are about decompression, not training. Keep things quiet, limit visitors, and let your puppy explore one room at a time. Short, positive moments beat long, exciting ones.",
+        "Expect a couple of unsettled nights — that's normal. A crate near your bed, a warm blanket, and a consistent bedtime routine help your puppy feel secure. Within a week, most puppies are sleeping through and finding their rhythm.",
+        "Stick to the feeding schedule and potty routine, and reach out to us anytime. We've raised this litter from day one and we're always glad to help.",
+      ],
+      image: images.diffHealthTested,
+    },
+    support: {
+      eyebrow: "We don't disappear",
+      heading: "Lifetime breeder support.",
+      body: "Questions about food, training, vet care, or just want to share a photo? We're a text away — for the whole life of your dog. If your circumstances ever change, your puppy always has a place to come back to.",
+    },
+    cta: {
+      eyebrow: "Ready when you are",
+      heading: "Have a question about bringing one home?",
+      body: "We're happy to walk you through what to expect and help you get ready.",
+      cta: { label: "Get in touch", href: "/contact" },
     },
   };
 }
