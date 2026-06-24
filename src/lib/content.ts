@@ -22,6 +22,7 @@ import type {
   LitterStatus,
   ParentsContent,
   ReserveContent,
+  Testimonial,
   TestimonialsContent,
   Waitlist,
   WaitlistState,
@@ -407,47 +408,83 @@ export async function getReserve(): Promise<ReserveContent> {
   }
 }
 
+const TESTIMONIALS_DEFAULT: TestimonialsContent = {
+  eyebrow: "Testimonials",
+  heading: "Families who chose us.",
+  intro:
+    "A few words from the homes our puppies have joined. Replace these with real notes from your families.",
+  items: [
+    {
+      quote:
+        "From our first call to pick-up day, everything was thoughtful and unhurried. Our puppy came home calm, healthy, and already so confident around our kids.",
+      name: "The Harrisons",
+      location: "Raleigh, NC",
+      rating: 5,
+      image: images.testimonial1,
+    },
+    {
+      quote:
+        "You can tell these dogs are raised underfoot, not in a kennel. The socialization showed immediately — crate training was nearly done for us.",
+      name: "Megan & Tyler",
+      location: "Charlotte, NC",
+      rating: 5,
+      image: images.testimonial2,
+    },
+    {
+      quote:
+        "Health testing, clear communication, and lifetime support that's actually real. We'll be back for our second from them.",
+      name: "The Bennetts",
+      location: "Wilmington, NC",
+      rating: 5,
+      image: images.testimonial3,
+    },
+    {
+      quote:
+        "Our girl is now a certified therapy dog. The temperament she came with made all the difference — exactly what they promised.",
+      name: "Dana P.",
+      location: "the Outer Banks",
+      rating: 5,
+      image: images.testimonial4,
+    },
+  ],
+};
+
+// Map an Airtable `image` value (e.g. "1" or "testimonial-2") to a manifest slot.
+const TESTIMONIAL_IMAGES: Record<string, (typeof images)[keyof typeof images]> = {
+  "1": images.testimonial1,
+  "2": images.testimonial2,
+  "3": images.testimonial3,
+  "4": images.testimonial4,
+};
+const testimonialImage = (key: string) => TESTIMONIAL_IMAGES[key.match(/\d/)?.[0] ?? ""];
+
+/** Pure mapper: Airtable rows -> Testimonial[] (skips rows missing quote/name). */
+export function mapTestimonialsRows(rows: Record<string, unknown>[]): Testimonial[] {
+  return rows
+    .map((r): Testimonial | null => {
+      const quote = str(r.quote);
+      const name = str(r.name);
+      if (!quote || !name) return null;
+      const ratingSet = r.rating != null && str(r.rating) !== "";
+      return {
+        quote,
+        name,
+        location: str(r.location) || undefined,
+        rating: ratingSet ? num(r.rating) : undefined,
+        image: testimonialImage(str(r.image)),
+      };
+    })
+    .filter((t): t is Testimonial => t !== null);
+}
+
 export async function getTestimonials(): Promise<TestimonialsContent> {
-  return {
-    eyebrow: "Testimonials",
-    heading: "Families who chose us.",
-    intro:
-      "A few words from the homes our puppies have joined. Replace these with real notes from your families.",
-    items: [
-      {
-        quote:
-          "From our first call to pick-up day, everything was thoughtful and unhurried. Our puppy came home calm, healthy, and already so confident around our kids.",
-        name: "The Harrisons",
-        location: "Raleigh, NC",
-        rating: 5,
-        image: images.testimonial1,
-      },
-      {
-        quote:
-          "You can tell these dogs are raised underfoot, not in a kennel. The socialization showed immediately — crate training was nearly done for us.",
-        name: "Megan & Tyler",
-        location: "Charlotte, NC",
-        rating: 5,
-        image: images.testimonial2,
-      },
-      {
-        quote:
-          "Health testing, clear communication, and lifetime support that's actually real. We'll be back for our second from them.",
-        name: "The Bennetts",
-        location: "Wilmington, NC",
-        rating: 5,
-        image: images.testimonial3,
-      },
-      {
-        quote:
-          "Our girl is now a certified therapy dog. The temperament she came with made all the difference — exactly what they promised.",
-        name: "Dana P.",
-        location: "the Outer Banks",
-        rating: 5,
-        image: images.testimonial4,
-      },
-    ],
-  };
+  if (!airtableConfigured()) return TESTIMONIALS_DEFAULT;
+  try {
+    const items = mapTestimonialsRows(await fetchTable("Testimonials"));
+    return items.length ? { ...TESTIMONIALS_DEFAULT, items } : TESTIMONIALS_DEFAULT;
+  } catch {
+    return TESTIMONIALS_DEFAULT;
+  }
 }
 
 export async function getFaqs(): Promise<Faq[]> {

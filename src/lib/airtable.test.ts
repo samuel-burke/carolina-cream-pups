@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapReserveRows, mapLitterStatusRows } from "./content";
+import { mapReserveRows, mapLitterStatusRows, mapTestimonialsRows } from "./content";
 
 // Airtable returns typed fields: single-selects as strings, numbers as numbers,
 // and omits empty fields entirely.
@@ -50,5 +50,22 @@ describe("mapLitterStatusRows", () => {
     ]);
     expect(closed.headline).not.toContain("waitlists open");
     expect(closed.cta.href).toBe("/reserve");
+  });
+});
+
+describe("mapTestimonialsRows", () => {
+  it("maps rows, skips incomplete ones, and resolves image slots", () => {
+    const items = mapTestimonialsRows([
+      { quote: "Wonderful experience.", name: "The Smiths", location: "Cary, NC", rating: 5, image: "1" },
+      { quote: "Great pup.", name: "Jordan" }, // no rating/location/image -> text-only
+      { quote: "", name: "Missing" }, // skipped (no quote)
+      { name: "No quote" }, // skipped
+    ]);
+    expect(items.length).toBe(2);
+    expect(items[0]).toMatchObject({ name: "The Smiths", rating: 5, location: "Cary, NC" });
+    expect(items[0].image?.src.length).toBeGreaterThan(0);
+    expect(items[1]).toMatchObject({ name: "Jordan" });
+    expect(items[1].rating).toBeUndefined();
+    expect(items[1].image).toBeUndefined();
   });
 });

@@ -32,6 +32,23 @@ testimonials, and photos still live in code / R2.)
 | `reservations` | Number (integer) | 2 |
 | `note` | Single line text | Next openings with the summer litter |
 
+**Table `Testimonials`** — one record per testimonial (add as many as you like).
+Fields:
+
+| Field | Type | Example |
+| ----- | ---- | ------- |
+| `quote` | Long text | "From our first call to pick-up day…" |
+| `name` | Single line text | The Harrisons |
+| `location` | Single line text | Raleigh, NC |
+| `rating` | Number (1–5, optional) | 5 |
+| `image` | Single line text (optional) | 1 |
+
+- A row needs at least `quote` + `name`; everything else is optional.
+- `image` is optional: put `1`–`4` to show one of the uploaded testimonial photos
+  (`testimonial-1.jpg`…`testimonial-4.jpg` on R2). Leave blank for a clean
+  text-only card. While `Testimonials` is empty (or Airtable is unconfigured), the
+  built-in sample testimonials show instead.
+
 > Table names and field names must match exactly (case-sensitive).
 
 ### 2. Create a read token
