@@ -49,5 +49,6 @@ export const nav: NavItem[] = [
   { href: "/parents", label: "Meet the Parents" },
   { href: "/reserve", label: "Reserve a Puppy" },
   { href: "/gallery", label: "Photo Gallery" },
+  { href: "/testimonials", label: "Testimonials" },
   { href: "/contact", label: "Contact" },
 ];

@@ -1,0 +1,31 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.quote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--size-lg);
+  line-height: 1.45;
+  color: var(--color-text);
+}
+
+.stars {
+  color: var(--color-sage);
+  letter-spacing: 2px;
+  font-size: var(--size-sm);
+}
+
+.starsEmpty {
+  color: var(--color-line);
+}
+
+.location {
+  font-weight: 400;
+  color: var(--color-muted);
+}

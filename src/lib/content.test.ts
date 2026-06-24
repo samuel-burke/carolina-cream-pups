@@ -7,9 +7,10 @@ import {
   getFaqs,
   getGallery,
   getHomeContent,
-  getLitter,
+  getReserve,
   getLitterStatus,
   getParentsContent,
+  getTestimonials,
 } from "./content";
 
 const PUBLIC = join(process.cwd(), "public");
@@ -53,20 +54,39 @@ describe("getParentsContent()", () => {
     expect(content.parents.length).toBe(3);
     for (const p of content.parents) {
       expect(p.clearances.length).toBeGreaterThan(0);
+      for (const c of p.clearances) {
+        expect(c.test.trim().length).toBeGreaterThan(0);
+        expect(c.result.trim().length).toBeGreaterThan(0);
+      }
       expectValidImage(p.image);
     }
     expect(content.pairing.points.length).toBeGreaterThan(0);
+
+    // Health-transparency block: testing standards + verifiable database links.
+    expect(content.health.standards.length).toBeGreaterThan(0);
+    expect(content.health.links.length).toBeGreaterThan(0);
+    for (const l of content.health.links) {
+      expect(l.label.trim().length).toBeGreaterThan(0);
+      expect(l.href.startsWith("http")).toBe(true);
+    }
   });
 });
 
-describe("getLitter() & getLitterStatus()", () => {
-  it("returns puppies with names, notes, and valid images", async () => {
-    const litter = await getLitter();
-    expect(litter.puppies.length).toBeGreaterThan(0);
-    for (const puppy of litter.puppies) {
-      expect(puppy.name.trim().length).toBeGreaterThan(0);
-      expect(puppy.note.trim().length).toBeGreaterThan(0);
-      expectValidImage(puppy.image);
+describe("getReserve() & getLitterStatus()", () => {
+  it("returns litter info, a valid parent pairing, and two waitlists", async () => {
+    const reserve = await getReserve();
+    expect(reserve.summary.trim().length).toBeGreaterThan(0);
+    expect(reserve.timingLabel.trim().length).toBeGreaterThan(0);
+    expect(["expected", "born"]).toContain(reserve.status);
+
+    expectValidImage(reserve.pairing.damImage);
+    expectValidImage(reserve.pairing.sireImage);
+
+    for (const list of [reserve.waitlists.male, reserve.waitlists.female]) {
+      expect(["Male", "Female"]).toContain(list.sex);
+      expect(["open", "full", "closed"]).toContain(list.state);
+      expect(Number.isInteger(list.reservations)).toBe(true);
+      expect(list.reservations).toBeGreaterThanOrEqual(0);
     }
   });
 
@@ -84,6 +104,22 @@ describe("getGallery()", () => {
     for (const { image } of gallery.litter.images) expectValidImage(image);
     expect(gallery.alumni.members.length).toBeGreaterThan(0);
     for (const m of gallery.alumni.members) expectValidImage(m.image);
+  });
+});
+
+describe("getTestimonials()", () => {
+  it("returns non-empty quotes with names and valid ratings", async () => {
+    const t = await getTestimonials();
+    expect(t.items.length).toBeGreaterThan(0);
+    for (const item of t.items) {
+      expect(item.quote.trim().length).toBeGreaterThan(0);
+      expect(item.name.trim().length).toBeGreaterThan(0);
+      if (item.rating !== undefined) {
+        expect(item.rating).toBeGreaterThanOrEqual(1);
+        expect(item.rating).toBeLessThanOrEqual(5);
+      }
+      if (item.image) expectValidImage(item.image);
+    }
   });
 });
 

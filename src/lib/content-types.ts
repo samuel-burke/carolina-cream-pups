@@ -18,19 +18,50 @@ export type LitterStatus = {
   cta: Cta;
 };
 
-export type Puppy = {
-  name: string;
-  meta: string;
-  note: string;
-  available: boolean;
-  image: ImageAsset;
+export type WaitlistState = "open" | "full" | "closed";
+
+/** One sex-specific reservation waitlist. Position = pick order. */
+export type Waitlist = {
+  sex: "Male" | "Female";
+  state: WaitlistState;
+  reservations: number;
+  note?: string;
 };
 
-export type Litter = {
+/** Compact dam × sire pairing for the current/upcoming litter. */
+export type LitterPairing = {
+  damName: string;
+  damImage: ImageAsset;
+  sireName: string;
+  sireImage: ImageAsset;
+};
+
+export type ReserveContent = {
+  status: "expected" | "born";
   title: string;
-  born: string;
-  readyNote: string;
-  puppies: Puppy[];
+  timingLabel: string;
+  summary: string;
+  /** Shown when born (e.g. "4 males · 2 females"); omit while expected. */
+  counts?: string;
+  pairing: LitterPairing;
+  waitlists: { male: Waitlist; female: Waitlist };
+};
+
+export type Testimonial = {
+  quote: string;
+  name: string;
+  location?: string;
+  /** 1–5; omit if you don't want a star rating shown. */
+  rating?: number;
+  /** Optional photo of the family's dog, shown on top of the card. */
+  image?: ImageAsset;
+};
+
+export type TestimonialsContent = {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  items: Testimonial[];
 };
 
 export type Faq = { question: string; answer: string };
@@ -60,11 +91,23 @@ export type AboutContent = {
   timeline: { eyebrow: string; heading: string; body: string; steps: TimelineStep[] };
 };
 
+export type Clearance = { test: string; result: string };
+
+export type LinkItem = { label: string; href: string };
+
 export type ParentProfile = {
   role: string;
   name: string;
+  /** AKC registered name. */
+  registeredName?: string;
+  /** CHIC number (Canine Health Information Center). */
+  chicNumber?: string;
+  /** Public link to this dog's OFA/CHIC record. */
+  verifyUrl?: string;
   description: string;
-  clearances: string[];
+  clearances: Clearance[];
+  /** Titles, certifications, working accomplishments. */
+  titles?: string[];
   image: ImageAsset;
 };
 
@@ -90,4 +133,13 @@ export type ParentsContent = {
   intro: string;
   parents: ParentProfile[];
   pairing: { eyebrow: string; heading: string; points: PairingPoint[] };
+  health: {
+    eyebrow: string;
+    heading: string;
+    body: string;
+    /** What every breeding dog is tested for. */
+    standards: string[];
+    /** Public verification databases (OFA, CHIC, AKC). */
+    links: LinkItem[];
+  };
 };

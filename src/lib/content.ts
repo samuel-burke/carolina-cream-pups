@@ -12,14 +12,18 @@
  * enforced by the types in content-types.ts.
  */
 import { galleryImages, images } from "./images";
+import { airtableConfigured, fetchTable } from "./airtable";
 import type {
   AboutContent,
   Faq,
   GalleryContent,
   HomeContent,
-  Litter,
   LitterStatus,
   ParentsContent,
+  ReserveContent,
+  TestimonialsContent,
+  Waitlist,
+  WaitlistState,
 } from "./content-types";
 
 export async function getHomeContent(): Promise<HomeContent> {
@@ -94,32 +98,54 @@ export async function getAboutContent(): Promise<AboutContent> {
 }
 
 export async function getParentsContent(): Promise<ParentsContent> {
-  const clearances = ["OFA Hips", "Elbows", "Heart", "Eyes", "Genetic Panel"];
+  // Placeholder clearances — replace each result, CHIC #, registered name, and
+  // verifyUrl with this dog's real OFA/CHIC record before launch.
+  const clearances = [
+    { test: "Hips", result: "OFA Good" },
+    { test: "Elbows", result: "OFA Normal" },
+    { test: "Heart", result: "Normal — Advanced Cardiac (cardiologist)" },
+    { test: "Eyes", result: "Normal — CAER" },
+    { test: "prcd-PRA", result: "Clear" },
+    { test: "Ichthyosis (ICT-A)", result: "Clear" },
+    { test: "DM", result: "Clear" },
+  ];
   return {
     eyebrow: "Meet the parents",
     heading: "Our dams & sires.",
     intro:
-      "Health clearances and temperament are everything. Here's who your puppies come from.",
+      "Health clearances and temperament are everything. Every result below is verifiable in the public OFA/CHIC databases — here's who your puppies come from.",
     parents: [
       {
         role: "Dam",
         name: "Name",
+        registeredName: "AKC registered name",
+        chicNumber: "Add CHIC #",
+        verifyUrl: "https://ofa.org/advanced-search/",
         description: "Temperament, weight, color, and a sentence on personality and lineage.",
         clearances,
+        titles: ["AKC Canine Good Citizen"],
         image: images.parentDam,
       },
       {
         role: "Sire",
         name: "Name",
+        registeredName: "AKC registered name",
+        chicNumber: "Add CHIC #",
+        verifyUrl: "https://ofa.org/advanced-search/",
         description: "Temperament, weight, color, and a sentence on personality and lineage.",
         clearances,
+        titles: ["AKC Canine Good Citizen"],
         image: images.parentSire,
       },
       {
         role: "Dam",
         name: "Name",
+        registeredName: "AKC registered name",
+        chicNumber: "Add CHIC #",
+        verifyUrl: "https://ofa.org/advanced-search/",
         description: "Temperament, weight, color, and a sentence on personality and lineage.",
         clearances,
+        titles: ["AKC Canine Good Citizen"],
         image: images.parentThird,
       },
     ],
@@ -139,6 +165,23 @@ export async function getParentsContent(): Promise<ParentsContent> {
           title: "Health depth",
           body: "Generations of cleared lines behind both parents, not just the parents themselves.",
         },
+      ],
+    },
+    health: {
+      eyebrow: "Health testing & ethics",
+      heading: "Every breeding dog is fully health tested — and you can verify it.",
+      body: "We test to the standards recommended for Golden Retrievers before any dog is bred, and we publish the results so you never have to take our word for it. Look up any of our dogs by name or CHIC number in the public databases below.",
+      standards: [
+        "Hips & elbows — OFA evaluated",
+        "Heart — OFA Advanced Cardiac, by a board-certified cardiologist",
+        "Eyes — annual OFA/CAER exam",
+        "Genetic panel — prcd-PRA, PRA1/PRA2, Ichthyosis, DM and more",
+        "CHIC number issued once all required tests are on file",
+      ],
+      links: [
+        { label: "OFA database (ofa.org)", href: "https://ofa.org/advanced-search/" },
+        { label: "About CHIC", href: "https://ofa.org/about/chic-program/" },
+        { label: "AKC", href: "https://www.akc.org/" },
       ],
     },
   };
@@ -173,41 +216,163 @@ export async function getGallery(): Promise<GalleryContent> {
   };
 }
 
-export async function getLitterStatus(): Promise<LitterStatus> {
+/**
+ * Operational data (current litter + the two waitlists) is editable in Airtable
+ * when AIRTABLE_API_KEY + AIRTABLE_BASE_ID are set; otherwise these in-code
+ * defaults are used (dev/CI/sandbox and as a resilient fallback if Airtable is
+ * unreachable).
+ */
+const RESERVE_SUMMARY =
+  "We reserve by waitlist, not by individual puppy. Join the male or female list with a deposit; when the litter arrives you choose in list order from the puppies of that sex — so your number is your pick order.";
+
+const RESERVE_DEFAULTS: ReserveContent = {
+  status: "born",
+  title: "Spring 2026 litter",
+  timingLabel: "Born March 2nd · ready for homes late April",
+  summary: RESERVE_SUMMARY,
+  counts: "4 males · 2 females",
+  pairing: { damName: "Name", damImage: images.parentDam, sireName: "Name", sireImage: images.parentSire },
+  waitlists: {
+    male: { sex: "Male", state: "open", reservations: 2 },
+    female: {
+      sex: "Female",
+      state: "full",
+      reservations: 5,
+      note: "Next openings expected with the summer litter.",
+    },
+  },
+};
+
+const LITTER_STATUS_DEFAULT: LitterStatus = {
+  headline: "Spring 2026 litter · waitlists open",
+  detail: "Next litter expected late summer.",
+  cta: { label: "See the litter & waitlists", href: "/reserve" },
+};
+
+const asState = (s: string): WaitlistState =>
+  s === "open" || s === "full" || s === "closed" ? s : "closed";
+
+/** Coerce an Airtable field to a trimmed string (single-selects/text). */
+const str = (v: unknown): string => (typeof v === "string" ? v.trim() : v == null ? "" : String(v));
+
+/** Coerce an Airtable field to a non-negative integer (number field). */
+const num = (v: unknown): number => {
+  const n = typeof v === "number" ? v : Number.parseInt(str(v), 10);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+};
+
+/** Build one Waitlist from the rows (matched by sex), with safe coercion. */
+function listFromRows(rows: Record<string, unknown>[], sex: "Male" | "Female"): Waitlist {
+  const r = rows.find((x) => str(x.sex).toLowerCase() === sex.toLowerCase());
+  const note = str(r?.note);
   return {
-    headline: "Spring 2026 litter · 3 spots open",
-    detail: "Next litter expected late summer.",
-    cta: { label: "See available puppies", href: "/reserve" },
+    sex,
+    state: asState(str(r?.state).toLowerCase()),
+    reservations: num(r?.reservations),
+    note: note ? note : undefined,
   };
 }
 
-export async function getLitter(): Promise<Litter> {
+/** Pure mapper: Airtable rows -> ReserveContent (images come from the manifest). */
+export function mapReserveRows(
+  litterRows: Record<string, unknown>[],
+  waitlistRows: Record<string, unknown>[],
+): ReserveContent {
+  const l = litterRows[0] ?? {};
   return {
-    title: "Spring 2026 litter",
-    born: "Born March 2nd",
-    readyNote:
-      "Born March 2nd · ready for homes late April. Three still looking for their families.",
-    puppies: [
+    status: str(l.status) === "expected" ? "expected" : "born",
+    title: str(l.title) || RESERVE_DEFAULTS.title,
+    timingLabel: str(l.timingLabel) || RESERVE_DEFAULTS.timingLabel,
+    summary: RESERVE_SUMMARY,
+    counts: str(l.counts) || undefined,
+    pairing: {
+      damName: str(l.damName) || "Name",
+      damImage: images.parentDam,
+      sireName: str(l.sireName) || "Name",
+      sireImage: images.parentSire,
+    },
+    waitlists: {
+      male: listFromRows(waitlistRows, "Male"),
+      female: listFromRows(waitlistRows, "Female"),
+    },
+  };
+}
+
+/** Pure mapper: Airtable rows -> the home status band. */
+export function mapLitterStatusRows(
+  litterRows: Record<string, unknown>[],
+  waitlistRows: Record<string, unknown>[],
+): LitterStatus {
+  const l = litterRows[0] ?? {};
+  const title = str(l.title) || RESERVE_DEFAULTS.title;
+  const male = listFromRows(waitlistRows, "Male");
+  const female = listFromRows(waitlistRows, "Female");
+  const anyOpen = male.state === "open" || female.state === "open";
+  return {
+    headline: `${title} · ${anyOpen ? "waitlists open" : "waitlist updates"}`,
+    detail: str(l.timingLabel) || LITTER_STATUS_DEFAULT.detail,
+    cta: { label: "See the litter & waitlists", href: "/reserve" },
+  };
+}
+
+export async function getLitterStatus(): Promise<LitterStatus> {
+  if (!airtableConfigured()) return LITTER_STATUS_DEFAULT;
+  try {
+    const [litter, lists] = await Promise.all([fetchTable("Litter"), fetchTable("Waitlists")]);
+    return mapLitterStatusRows(litter, lists);
+  } catch {
+    return LITTER_STATUS_DEFAULT;
+  }
+}
+
+export async function getReserve(): Promise<ReserveContent> {
+  if (!airtableConfigured()) return RESERVE_DEFAULTS;
+  try {
+    const [litter, lists] = await Promise.all([fetchTable("Litter"), fetchTable("Waitlists")]);
+    return mapReserveRows(litter, lists);
+  } catch {
+    return RESERVE_DEFAULTS;
+  }
+}
+
+export async function getTestimonials(): Promise<TestimonialsContent> {
+  return {
+    eyebrow: "Testimonials",
+    heading: "Families who chose us.",
+    intro:
+      "A few words from the homes our puppies have joined. Replace these with real notes from your families.",
+    items: [
       {
-        name: "Biscuit",
-        meta: "Male · cream",
-        note: "The confident one — first to every new thing, loves people.",
-        available: true,
-        image: images.puppyBiscuit,
+        quote:
+          "From our first call to pick-up day, everything was thoughtful and unhurried. Our puppy came home calm, healthy, and already so confident around our kids.",
+        name: "The Harrisons",
+        location: "Raleigh, NC",
+        rating: 5,
+        image: images.testimonial1,
       },
       {
-        name: "Willow",
-        meta: "Female · light gold",
-        note: "Gentle and watchful. Settles fast, great with kids.",
-        available: true,
-        image: images.puppyWillow,
+        quote:
+          "You can tell these dogs are raised underfoot, not in a kennel. The socialization showed immediately — crate training was nearly done for us.",
+        name: "Megan & Tyler",
+        location: "Charlotte, NC",
+        rating: 5,
+        image: images.testimonial2,
       },
       {
-        name: "Sailor",
-        meta: "Male · cream",
-        note: "Playful and food-motivated — will be a joy to train.",
-        available: true,
-        image: images.puppySailor,
+        quote:
+          "Health testing, clear communication, and lifetime support that's actually real. We'll be back for our second from them.",
+        name: "The Bennetts",
+        location: "Wilmington, NC",
+        rating: 5,
+        image: images.testimonial3,
+      },
+      {
+        quote:
+          "Our girl is now a certified therapy dog. The temperament she came with made all the difference — exactly what they promised.",
+        name: "Dana P.",
+        location: "the Outer Banks",
+        rating: 5,
+        image: images.testimonial4,
       },
     ],
   };
@@ -218,7 +383,7 @@ export async function getFaqs(): Promise<Faq[]> {
     {
       question: "How do I reserve a puppy?",
       answer:
-        "Start with a short application — there's no deposit to apply. Once we confirm we're a good fit, a deposit holds your spot in the litter, and you choose your puppy on pick day in birth order by deposit.",
+        "Start with a short application — there's no deposit to apply. Once we're a good fit, a deposit reserves your numbered spot on either the male or female waitlist. When the litter arrives, families choose in list order from the puppies of that sex — you reserve a spot in line, not a specific puppy.",
     },
     {
       question: "What comes home with the puppy?",

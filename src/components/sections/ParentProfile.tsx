@@ -5,26 +5,57 @@ import styles from "./ParentProfile.module.css";
 export function ParentProfile({
   role,
   name,
+  registeredName,
+  chicNumber,
+  verifyUrl,
   description,
   clearances,
+  titles,
   image,
 }: ParentProfileContent) {
   return (
-    <Grid cols={2} gap={4} templateDesktop="1fr 1.2fr" className={styles.profile} style={{ alignItems: "center" }}>
+    <Grid cols={2} gap={4} templateDesktop="1fr 1.2fr" className={styles.profile} style={{ alignItems: "start" }}>
       <ImageBox image={image} ratio="4/5" sizes="(max-width: 768px) 100vw, 45vw" />
       <div>
         <Eyebrow>{role}</Eyebrow>
         <Heading level={3}>{name}</Heading>
+        {registeredName ? (
+          <Text muted style={{ fontSize: "var(--size-sm)", marginTop: "0.25rem" }}>
+            {registeredName}
+            {chicNumber ? ` · CHIC ${chicNumber}` : ""}
+          </Text>
+        ) : null}
         <Text muted style={{ marginTop: "1rem" }}>
           {description}
         </Text>
-        <ul className={styles.badges}>
+
+        <dl className={styles.clearances}>
           {clearances.map((c) => (
-            <li key={c} className={styles.badge}>
-              {c} ✓
-            </li>
+            <div key={c.test} className={styles.row}>
+              <dt className={styles.test}>{c.test}</dt>
+              <dd className={styles.result}>{c.result}</dd>
+            </div>
           ))}
-        </ul>
+        </dl>
+
+        {verifyUrl ? (
+          <a className={styles.verify} href={verifyUrl} target="_blank" rel="noopener noreferrer">
+            Verify on OFA →
+          </a>
+        ) : null}
+
+        {titles && titles.length > 0 ? (
+          <div className={styles.titles}>
+            <span className={styles.titlesLabel}>Titles &amp; accomplishments</span>
+            <ul className={styles.badges}>
+              {titles.map((t) => (
+                <li key={t} className={styles.badge}>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </div>
     </Grid>
   );

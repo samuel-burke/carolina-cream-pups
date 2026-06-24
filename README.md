@@ -60,13 +60,17 @@ All editable content (litters, puppies, photos, page copy, FAQ, gallery) flows
 through one typed, async layer:
 
 - `src/lib/content-types.ts` — the shape of every piece of content.
-- `src/lib/content.ts` — async accessors (`getHomeContent`, `getLitter`,
+- `src/lib/content.ts` — async accessors (`getHomeContent`, `getReserve`,
   `getFaqs`, `getGallery`, …). Pages `await` these; to edit content today, change
   the data returned here.
 
-This indirection is deliberate: it makes adding a CMS later a drop-in change
-(swap the accessor bodies to fetch from the CMS, types stay the same) without
-touching any component or page. See [`docs/SANITY-MIGRATION.md`](docs/SANITY-MIGRATION.md).
+This indirection is deliberate: it makes swapping the source a drop-in change
+(types stay the same) without touching any component or page.
+
+**The litter & waitlists are editable without code** via Airtable —
+`getReserve`/`getLitterStatus` read it when `AIRTABLE_API_KEY` + `AIRTABLE_BASE_ID`
+are set, and fall back to in-code defaults otherwise. See [`docs/ADMIN-AIRTABLE.md`](docs/ADMIN-AIRTABLE.md).
+(A fuller CMS for copy/media remains an option: [`docs/SANITY-MIGRATION.md`](docs/SANITY-MIGRATION.md).)
 
 Stable, non-editable config (brand/business info, navigation, SEO) stays in
 `src/lib/site.ts` and feeds the sitemap, metadata, and structured data.
@@ -100,10 +104,11 @@ currently logs them. Wire up an email/CRM provider where marked in
 
 - Per-page metadata, canonical URLs, Open Graph + Twitter cards, and a generated
   `og.png` social image.
-- Structured data: `LocalBusiness` (site-wide), `BreadcrumbList` (subpages), and
-  `FAQPage` (Reserve page). Sitemap and robots are generated from the nav config.
-- Analytics is off by default. Set `NEXT_PUBLIC_ANALYTICS_DOMAIN` to enable a
-  cookieless, Plausible-compatible script (see `.env.example`).
+- Structured data: `LocalBusiness` (site-wide), `BreadcrumbList` (subpages),
+  `FAQPage` (Reserve page), and `Review`/`AggregateRating` (Testimonials page).
+  Sitemap and robots are generated from the nav config.
+- Analytics: Vercel Web Analytics (`@vercel/analytics`), enabled from the Vercel
+  dashboard — no env var or third-party script to configure.
 
 FAQ content lives in `src/lib/content.ts` (`getFaqs`) — answers are placeholders;
 edit them to match your real policies before launch.
