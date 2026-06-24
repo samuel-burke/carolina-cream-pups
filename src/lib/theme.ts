@@ -19,7 +19,7 @@ export const theme = {
     placeholder: "#E9E1D3",
     text: "#3A352E",
     textOn: "#FFFDF8", // text on dark/photo backgrounds
-    muted: "#8C857A",
+    muted: "#736D62", // WCAG AA on bg/surface (~4.8:1)
     sage: "#8A9A85",
     sageDeep: "#6E7E69",
     taupe: "#B7A892",
