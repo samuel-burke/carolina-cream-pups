@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import { emailConfigured, sendContactEmail } from "@/lib/email";
 
 /**
- * Contact form endpoint. Validates input server-side and (for now) logs the
- * message. Wire up a real delivery mechanism where indicated — e.g. Resend,
- * Postmark, SendGrid, or a Formspree-style service — using a server-side env
- * var for the API key. Keep validation here regardless of provider.
+ * Contact form endpoint. Validates input server-side, then delivers the message
+ * via Resend when email is configured (see src/lib/email.ts). With no email env
+ * set — local dev, CI, preview — it falls back to logging so the form still
+ * "works" without secrets. Validation runs regardless of provider.
  */
 
 export const runtime = "nodejs";
@@ -43,9 +44,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 422 });
   }
 
-  // TODO: deliver the message (email/CRM). Example:
-  //   await sendEmail({ to: site.contact.email, replyTo: email, name, phone, message });
-  console.info("[contact] new inquiry", { name, email, phone: body.phone ?? "" });
+  const phone = body.phone?.trim() || undefined;
+
+  if (emailConfigured()) {
+    try {
+      await sendContactEmail({ name, email, phone, message });
+    } catch (err) {
+      console.error("[contact] delivery failed", err);
+      return NextResponse.json(
+        { error: "Sorry — we couldn't send your message. Please email us directly." },
+        { status: 502 },
+      );
+    }
+  } else {
+    // No email provider configured: log so the inquiry isn't lost in dev/preview.
+    console.info("[contact] new inquiry (email not configured)", { name, email, phone: phone ?? "" });
+  }
 
   return NextResponse.json({ ok: true });
 }
