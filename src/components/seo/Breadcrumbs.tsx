@@ -1,4 +1,4 @@
-import { nav, site } from "@/lib/site";
+import { nav, secondaryNav, site } from "@/lib/site";
 
 /**
  * Emits BreadcrumbList structured data (Home › Page) for a subpage. Invisible —
@@ -6,7 +6,7 @@ import { nav, site } from "@/lib/site";
  * label from the nav config so there's a single source of truth.
  */
 export function Breadcrumbs({ href }: { href: string }) {
-  const page = nav.find((n) => n.href === href);
+  const page = [...nav, ...secondaryNav].find((n) => n.href === href);
   if (!page || href === "/") return null;
 
   const data = {

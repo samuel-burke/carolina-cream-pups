@@ -52,3 +52,9 @@ export const nav: NavItem[] = [
   { href: "/testimonials", label: "Testimonials" },
   { href: "/contact", label: "Contact" },
 ];
+
+/**
+ * Secondary pages — shown in the footer and included in the sitemap, but kept out
+ * of the header nav to avoid crowding it.
+ */
+export const secondaryNav: NavItem[] = [{ href: "/faq", label: "FAQ" }];
