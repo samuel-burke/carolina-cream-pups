@@ -6,6 +6,7 @@ import {
   getAboutContent,
   getFaqs,
   getGallery,
+  getGoingHomeContent,
   getHomeContent,
   getReserve,
   getLitterStatus,
@@ -120,6 +121,22 @@ describe("getTestimonials()", () => {
       }
       if (item.image) expectValidImage(item.image);
     }
+  });
+});
+
+describe("getGoingHomeContent()", () => {
+  it("returns included items, prepare steps, first-days copy + image, support, and a CTA", async () => {
+    const c = await getGoingHomeContent();
+    expect(c.included.items.length).toBeGreaterThan(0);
+    for (const item of c.included.items) {
+      expect(item.title.trim().length).toBeGreaterThan(0);
+      expect(item.body.trim().length).toBeGreaterThan(0);
+    }
+    expect(c.prepare.steps.length).toBeGreaterThan(0);
+    expect(c.firstDays.paragraphs.length).toBeGreaterThan(0);
+    expectValidImage(c.firstDays.image);
+    expect(c.support.body.trim().length).toBeGreaterThan(0);
+    expect(c.cta.cta.href.startsWith("/")).toBe(true);
   });
 });
 

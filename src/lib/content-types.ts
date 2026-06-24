@@ -91,6 +91,18 @@ export type AboutContent = {
   timeline: { eyebrow: string; heading: string; body: string; steps: TimelineStep[] };
 };
 
+/** "Going home" — what's included + how to prepare for a new puppy. */
+export type GoingHomeContent = {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  included: { eyebrow: string; heading: string; items: PairingPoint[] };
+  prepare: { eyebrow: string; heading: string; body: string; steps: TimelineStep[] };
+  firstDays: { eyebrow: string; heading: string; paragraphs: string[]; image: ImageAsset };
+  support: { eyebrow: string; heading: string; body: string };
+  cta: { eyebrow: string; heading: string; body: string; cta: Cta };
+};
+
 export type Clearance = { test: string; result: string };
 
 export type LinkItem = { label: string; href: string };

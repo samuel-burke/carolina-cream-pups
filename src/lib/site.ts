@@ -48,6 +48,7 @@ export const nav: NavItem[] = [
   { href: "/about", label: "About Us" },
   { href: "/parents", label: "Meet the Parents" },
   { href: "/reserve", label: "Reserve a Puppy" },
+  { href: "/going-home", label: "Going Home" },
   { href: "/gallery", label: "Photo Gallery" },
   { href: "/testimonials", label: "Testimonials" },
   { href: "/contact", label: "Contact" },
