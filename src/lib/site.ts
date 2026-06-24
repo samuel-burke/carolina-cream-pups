@@ -26,13 +26,27 @@ export const site = {
   breed: "English Cream Golden Retriever",
   contact: {
     email: "hello@carolinacreampups.com",
-    // Add real handles when available; empty entries are skipped in the UI.
+    // Optional phone — shown + added to structured data when set.
+    phone: "",
+    // Full profile URLs when available; empty entries are skipped everywhere.
     social: {
       instagram: "",
       facebook: "",
     },
   },
 } as const;
+
+/** Non-empty social profiles as {label, href} — used in the footer, contact
+ * page, and the JSON-LD `sameAs`. Add URLs in `site.contact.social` to surface. */
+export function socialLinks(): { label: string; href: string }[] {
+  const s = site.contact.social;
+  return (
+    [
+      { label: "Instagram", href: s.instagram as string },
+      { label: "Facebook", href: s.facebook as string },
+    ] as { label: string; href: string }[]
+  ).filter((l) => l.href.length > 0);
+}
 
 /**
  * When true, the site asks search engines not to index it. Set

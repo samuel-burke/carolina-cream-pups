@@ -3,7 +3,7 @@ import { Section, Grid, Eyebrow, Heading, Text, Card, ImageBox } from "@/compone
 import { ContactForm } from "@/components/sections/ContactForm";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { images } from "@/lib/images";
-import { site } from "@/lib/site";
+import { site, socialLinks } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
+  const socials = socialLinks();
   return (
     <>
       <Breadcrumbs href="/contact" />
@@ -33,6 +34,20 @@ export default function ContactPage() {
             <Text muted style={{ marginTop: "0.5rem" }}>
               <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
             </Text>
+            {site.contact.phone ? (
+              <Text muted style={{ marginTop: "0.5rem" }}>
+                <a href={`tel:${site.contact.phone}`}>{site.contact.phone}</a>
+              </Text>
+            ) : null}
+            {socials.length > 0 ? (
+              <div style={{ display: "flex", gap: "1rem", marginTop: "0.75rem" }}>
+                {socials.map((s) => (
+                  <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer">
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
             <div
               style={{
                 marginTop: "1.5rem",
