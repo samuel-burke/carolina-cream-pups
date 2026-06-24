@@ -56,6 +56,8 @@ queries (breakpoint: 768px) — there is no JS width detection.
 
 ## Content
 
+**Editing the site? Start with [CONTENT.md](CONTENT.md)** — a map of what to change and where.
+
 All editable content (litters, puppies, photos, page copy, FAQ, gallery) flows
 through one typed, async layer:
 
