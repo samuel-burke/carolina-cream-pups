@@ -73,3 +73,9 @@ export const nav: NavItem[] = [
  * of the header nav to avoid crowding it.
  */
 export const secondaryNav: NavItem[] = [{ href: "/faq", label: "FAQ" }];
+
+/** Secondary / legal links — shown in the footer, not the primary header. */
+export const legalNav: NavItem[] = [
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Terms of Use" },
+];

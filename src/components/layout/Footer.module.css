@@ -51,10 +51,31 @@
   color: #fff;
 }
 
-.copyright {
-  color: color-mix(in srgb, var(--color-taupe) 75%, transparent);
-  font-size: var(--size-xs);
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-top: 2rem;
   padding-top: 1.25rem;
   border-top: 1px solid color-mix(in srgb, var(--color-taupe) 30%, transparent);
+}
+@media (min-width: 768px) {
+  .bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.copyright {
+  color: color-mix(in srgb, var(--color-taupe) 75%, transparent);
+  font-size: var(--size-xs);
+}
+
+.legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
 }

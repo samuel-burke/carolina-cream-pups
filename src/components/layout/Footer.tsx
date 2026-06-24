@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container, Text } from "@/components/ui";
-import { nav, secondaryNav, site, socialLinks } from "@/lib/site";
+import { legalNav, nav, secondaryNav, site, socialLinks } from "@/lib/site";
 import { Logo } from "./Logo";
 import styles from "./Footer.module.css";
 
@@ -39,10 +39,17 @@ export function Footer() {
           ))}
         </nav>
       </Container>
-      <Container>
+      <Container className={styles.bottom}>
         <Text className={styles.copyright}>
           © {new Date().getFullYear()} {site.legalName}. All rights reserved.
         </Text>
+        <nav className={styles.legal} aria-label="Legal">
+          {legalNav.map(({ href, label }) => (
+            <Link key={href} href={href} className={styles.link}>
+              {label}
+            </Link>
+          ))}
+        </nav>
       </Container>
     </footer>
   );
