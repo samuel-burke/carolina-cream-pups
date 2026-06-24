@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Container, Text } from "@/components/ui";
-import { nav, site } from "@/lib/site";
+import { nav, secondaryNav, site } from "@/lib/site";
 import { Logo } from "./Logo";
 import styles from "./Footer.module.css";
 
 export function Footer() {
+  const links = [...nav, ...secondaryNav];
   return (
     <footer className={styles.footer}>
       <Container className={styles.inner}>
@@ -15,7 +16,7 @@ export function Footer() {
           </Text>
         </div>
         <nav className={styles.links} aria-label="Footer">
-          {nav.map(({ href, label }) => (
+          {links.map(({ href, label }) => (
             <Link key={href} href={href} className={styles.link}>
               {label}
             </Link>
