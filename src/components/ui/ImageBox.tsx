@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { ImageAsset } from "@/lib/images";
+import { resolvePublicId } from "@/lib/cloudinary";
 import { CloudinaryImage } from "./CloudinaryImage";
 import styles from "./ImageBox.module.css";
 
@@ -25,7 +26,7 @@ type Props = {
  * responsive AVIF/WebP, blur-up, CDN cache); when Cloudinary isn't configured,
  * the local SVG placeholder is shown via next/image.
  */
-export function ImageBox({
+export async function ImageBox({
   image,
   ratio = "4/3",
   keyline = true,
@@ -35,6 +36,8 @@ export function ImageBox({
   className,
   style,
 }: Props) {
+  // Resolve the real Cloudinary public id (handles the upload suffix + folder).
+  const resolved = image.cloudinaryId ? await resolvePublicId(image.cloudinaryId) : null;
   const cls = [
     styles.frame,
     keyline ? styles.keyline : styles.plainLine,
@@ -46,9 +49,9 @@ export function ImageBox({
 
   return (
     <div className={cls} style={{ aspectRatio: ratio, ...style }}>
-      {image.cloudinaryId ? (
+      {resolved ? (
         <CloudinaryImage
-          publicId={image.cloudinaryId}
+          publicId={resolved.publicId}
           alt={image.alt}
           sizes={sizes}
           priority={priority}

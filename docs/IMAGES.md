@@ -23,43 +23,47 @@ local SVG placeholder in `/public/images`, so the site always builds.
 
 1. Create a free account at [cloudinary.com](https://cloudinary.com).
 2. Find your **cloud name** (Dashboard → Product Environment / top of the page).
-3. Create an **API key + secret** (Settings → API Keys) — only needed so the
-   gallery can auto-list its folder.
+3. Create an **API key + secret** (Settings → API Keys). **Required:** Cloudinary
+   adds a random suffix to uploads (`hero` → `hero_gq2zgp`), so the site looks up
+   each photo by name via the API rather than guessing the URL.
 4. Add these in Vercel (Project → Settings → Environment Variables), Production
-   (and Preview if you want it on the beta site):
+   **and Preview** (the `dev`/beta site needs them too):
    - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` = your cloud name
    - `CLOUDINARY_API_KEY` = your key (server-only)
    - `CLOUDINARY_API_SECRET` = your secret (server-only)
 5. Redeploy.
 
-## Folder layout (match these names)
+## Naming (this is what matters)
 
-In the Cloudinary Media Library, create folders and upload images named to match
-the slots. The **public id** = folder + name (no extension).
+The site finds each photo by its **name** (the filename you upload, without the
+extension), ignoring Cloudinary's random suffix. **Folders are just for your own
+organization** — you can use them or not; only the name has to match.
 
-| Folder / public id | Where it shows |
+| Upload a photo named… | Where it shows |
 | --- | --- |
-| `home/hero` | Home hero background |
-| `home/breeder-home` | Home intro photo |
-| `home/diff-puppy-culture`, `home/diff-health-tested`, `home/diff-ens` | Home "why families choose us" |
-| `about/about-portrait` | About page |
-| `parents/parent-dam`, `parents/parent-sire`, `parents/parent-3` | Meet the Parents (dam/sire also on Reserve) |
-| `alumni/alumni-luna`, `alumni/alumni-cooper`, `alumni/alumni-daisy` | Gallery "where they are now" |
-| `contact/contact-map` | Contact page |
-| `testimonials/testimonial-1` … `-4` | Testimonial photos |
-| `gallery/<anything>` | Photo gallery — **every** image in this folder shows, ordered by name |
+| `hero` | Home hero background |
+| `breeder-home` | Home intro photo |
+| `diff-puppy-culture`, `diff-health-tested`, `diff-ens` | Home "why families choose us" |
+| `about-portrait` | About page |
+| `parent-dam`, `parent-sire`, `parent-3` | Meet the Parents (dam/sire also on Reserve) |
+| `alumni-luna`, `alumni-cooper`, `alumni-daisy` | Gallery "where they are now" |
+| `contact-map` | Contact page |
+| `testimonial-1` … `testimonial-4` | Testimonial photos |
+| anything in a **`gallery`** folder | Photo gallery — every image there shows, ordered by name |
 
-> Cloudinary's "public id" is the folder path + the file's name without its
-> extension. Upload `hero.jpg` into a `home` folder and its public id is
-> `home/hero` — exactly what the site asks for.
+> Example: drag `hero.jpg` into the Media Library (any folder). Its name is
+> `hero`, so it becomes the home hero — even though Cloudinary stores it as
+> `hero_ab12cd`. To use folders for tidiness, put the gallery photos in a folder
+> literally named `gallery`.
 
 ## Changing a photo
 
 1. Open the Cloudinary **Media Library**.
-2. Go to the folder (e.g. `parents`) and **upload your new photo with the same
-   name** (`parent-dam`), overwriting the old one (choose "overwrite"/"replace"
-   when prompted). Cloudinary invalidates its cache automatically, so the change
-   shows within seconds — no purge, no redeploy.
+2. **Upload your new photo with the same name** (e.g. `parent-dam`), overwriting
+   the old one (choose "replace" when prompted), or delete the old one and upload
+   the new. The site picks it up automatically — names are matched, suffix and
+   all. Changes appear within ~5 minutes (or instantly if you hit the revalidate
+   webhook).
 
 Adding gallery photos is even simpler: drop any images into the `gallery` folder
 and they appear automatically, ordered by filename (prefix `01-`, `02-`, … to

@@ -1,15 +1,17 @@
 import Image from "next/image";
 import { Container, Heading, Button } from "@/components/ui";
 import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
+import { resolvePublicId } from "@/lib/cloudinary";
 import type { HomeContent } from "@/lib/content-types";
 import styles from "./HomeHero.module.css";
 
-export function HomeHero({ hero }: { hero: HomeContent["hero"] }) {
+export async function HomeHero({ hero }: { hero: HomeContent["hero"] }) {
+  const resolved = hero.image.cloudinaryId ? await resolvePublicId(hero.image.cloudinaryId) : null;
   return (
     <section className={styles.hero} aria-label="Welcome">
-      {hero.image.cloudinaryId ? (
+      {resolved ? (
         <CloudinaryImage
-          publicId={hero.image.cloudinaryId}
+          publicId={resolved.publicId}
           alt={hero.image.alt}
           priority
           sizes="100vw"
