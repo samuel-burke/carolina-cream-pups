@@ -12,7 +12,7 @@
  * Media Library, using the same name (e.g. home/hero). No code, no commit.
  * See docs/IMAGES.md.
  */
-import { listCloudinaryFolder } from "./cloudinary";
+import { galleryAssets } from "./cloudinary";
 
 /** Cloud name (client-visible). Unset => local placeholders everywhere. */
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "";
@@ -89,7 +89,7 @@ const GALLERY_PLACEHOLDERS: ImageAsset[] = [
 export async function galleryImages(): Promise<ImageAsset[]> {
   if (cloudName) {
     try {
-      const remote = await listCloudinaryFolder("gallery");
+      const remote = await galleryAssets();
       if (remote.length) return remote;
     } catch {
       // fall through to placeholders
