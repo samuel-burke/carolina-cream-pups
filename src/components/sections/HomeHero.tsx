@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { CldImage } from "next-cloudinary";
 import { Container, Heading, Button } from "@/components/ui";
+import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
 import type { HomeContent } from "@/lib/content-types";
 import styles from "./HomeHero.module.css";
 
@@ -8,15 +8,11 @@ export function HomeHero({ hero }: { hero: HomeContent["hero"] }) {
   return (
     <section className={styles.hero} aria-label="Welcome">
       {hero.image.cloudinaryId ? (
-        <CldImage
-          src={hero.image.cloudinaryId}
+        <CloudinaryImage
+          publicId={hero.image.cloudinaryId}
           alt={hero.image.alt}
-          fill
           priority
           sizes="100vw"
-          crop="fill"
-          gravity="auto"
-          placeholder="blur"
           className={styles.img}
         />
       ) : (
