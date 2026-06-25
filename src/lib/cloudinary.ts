@@ -106,6 +106,48 @@ export async function resolvePublicId(slotId: string): Promise<ResolvedAsset | n
 }
 
 /**
+ * TEMPORARY diagnostic — surfaces what the deployed site sees so we can tell why
+ * photos aren't resolving (config, what's actually in the account, and whether a
+ * few slots match). No secrets are returned. Remove once images are working.
+ */
+export async function debugInfo() {
+  const slots = ["home/hero", "parents/parent-dam", "about/about-portrait", "contact/contact-map"];
+  let resources: RawResource[] = [];
+  let fetchError: string | null = null;
+  try {
+    resources = await fetchAllImages();
+  } catch (e) {
+    fetchError = e instanceof Error ? e.message : String(e);
+  }
+  const samples = resources.slice(0, 20).map((r) => ({
+    public_id: r.public_id,
+    asset_folder: r.asset_folder ?? null,
+    display_name: r.display_name ?? null,
+    keys: keysFor(r),
+  }));
+  const resolved: Record<string, string | null> = {};
+  for (const s of slots) {
+    const hit = await resolvePublicId(s);
+    resolved[s] = hit ? hit.publicId : null;
+  }
+  let galleryCount = 0;
+  try {
+    galleryCount = (await galleryAssets()).length;
+  } catch {
+    /* ignore */
+  }
+  return {
+    cloudNameConfigured: cloudinaryConfigured(),
+    adminConfigured: cloudinaryAdminConfigured(),
+    totalImagesFound: resources.length,
+    fetchError,
+    galleryCount,
+    resolvedSlots: resolved,
+    sampleAssets: samples,
+  };
+}
+
+/**
  * Every image in the "gallery" folder, ordered by name. Falls back to matching
  * public ids that start with "gallery" when folder metadata isn't present.
  */
