@@ -7,7 +7,7 @@ import { getGallery } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Photo Gallery",
   description:
-    "Photos of our recent English Cream Golden Retriever litters — and past puppies all grown up with their families across North Carolina.",
+    "Photos of our recent English Cream Golden Retriever litters, plus past puppies all grown up with their families across North Carolina.",
   alternates: { canonical: "/gallery" },
 };
 

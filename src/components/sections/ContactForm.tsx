@@ -39,8 +39,8 @@ export function ContactForm() {
   if (status === "success") {
     return (
       <div className={styles.success} role="status">
-        <p className={styles.successTitle}>Thank you — your message is on its way.</p>
-        <p>We typically reply within a day. Keep an eye on your inbox.</p>
+        <p className={styles.successTitle}>Thanks! Your message is on its way.</p>
+        <p>We usually reply within a day, so keep an eye on your inbox.</p>
       </div>
     );
   }

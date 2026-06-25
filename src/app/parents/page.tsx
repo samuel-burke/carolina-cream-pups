@@ -7,7 +7,7 @@ import { getParentsContent } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Meet the Parents",
   description:
-    "Meet the dam and sire behind our English Cream Golden Retriever puppies — health clearances (OFA hips, elbows, heart, eyes) and temperament you can verify.",
+    "Meet the dam and sire behind our English Cream Golden Retriever puppies, with health clearances (OFA hips, elbows, heart, eyes) and temperament you can verify.",
   alternates: { canonical: "/parents" },
 };
 
