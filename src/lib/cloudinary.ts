@@ -15,9 +15,11 @@
  */
 import type { ImageAsset } from "./images";
 
-const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "";
-const KEY = process.env.CLOUDINARY_API_KEY ?? "";
-const SECRET = process.env.CLOUDINARY_API_SECRET ?? "";
+// Trim to guard against a stray space/newline when the values are pasted into the
+// host's env settings — a common cause of a Cloudinary 401.
+const CLOUD = (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "").trim();
+const KEY = (process.env.CLOUDINARY_API_KEY ?? "").trim();
+const SECRET = (process.env.CLOUDINARY_API_SECRET ?? "").trim();
 
 /** Enough to build delivery URLs. */
 export const cloudinaryConfigured = (): boolean => CLOUD.length > 0;
