@@ -1,116 +1,75 @@
-# Images & the Cloudflare R2 CDN
+# Images (Cloudinary)
 
-Real photos are hosted on **Cloudflare R2** (object storage + CDN) and served
-through `next/image`, which optimizes them to responsive AVIF/WebP on Vercel's
-edge. Photos live on the CDN, **not in git** — only tiny metadata (dimensions +
-blur placeholders) is committed.
+Photos are hosted on **Cloudinary** and rendered with `<CldImage>`
+(`next-cloudinary`), which automatically does responsive sizing, AVIF/WebP,
+blur-up placeholders, and CDN caching. **Changing a photo is drag-and-drop** in
+the Cloudinary Media Library — no code, no git, no cache purging.
+
+When Cloudinary isn't configured (local dev / CI), every image falls back to the
+local SVG placeholder in `/public/images`, so the site always builds.
 
 ## How it fits together
 
-- `src/lib/images.ts` — the manifest. Each slot is `slot("hero", alt, w, h)` and
-  resolves automatically: the R2 photo when its `<name>.jpg` metadata exists and
-  the CDN env var is set, otherwise the local `<name>.svg` placeholder. No manual
-  edits are needed to switch a slot over — committing the metadata does it.
-- `NEXT_PUBLIC_IMAGE_BASE_URL` — the R2 public origin (e.g.
-  `https://images.carolinacreampups.com`). `photo()` builds its URL from this,
-  and `next.config.mjs` adds the host to `images.remotePatterns` automatically.
-  Unset → everything falls back to `/public/images` (dev/CI safe).
-- `src/lib/image-meta.generated.json` — width/height + `blurDataURL` per file,
-  produced by the pipeline and committed (a few KB).
+- `src/lib/images.ts` — the manifest. Each slot maps a key (e.g. `heroHome`) to a
+  Cloudinary **public id** in a page folder (e.g. `home/hero`). It serves the
+  Cloudinary photo when `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is set, else the local
+  placeholder. No edits needed to swap a photo.
+- `src/lib/cloudinary.ts` — lists the `gallery` folder so the gallery page shows
+  whatever you've uploaded (server-only; uses the API key/secret).
+- `ImageBox` / `HomeHero` — render `<CldImage>` for real photos, `next/image`
+  for placeholders.
 
-## One-time R2 setup
+## One-time setup
 
-1. **Create a bucket** in the Cloudflare dashboard (R2 → Create bucket), e.g.
-   `carolina-cream-pups`.
-2. **Make it public** with a custom domain: bucket → Settings → Public access →
-   *Connect Domain* → `images.carolinacreampups.com`. (If your DNS is on
-   Cloudflare this is automatic; otherwise add the CNAME it gives you.) The
-   `r2.dev` URL also works for testing but is rate-limited — use a custom domain
-   for production.
-3. **Set the env var** in Vercel (both Production and Preview) and locally:
-   `NEXT_PUBLIC_IMAGE_BASE_URL=https://images.carolinacreampups.com`
+1. Create a free account at [cloudinary.com](https://cloudinary.com).
+2. Find your **cloud name** (Dashboard → Product Environment / top of the page).
+3. Create an **API key + secret** (Settings → API Keys) — only needed so the
+   gallery can auto-list its folder.
+4. Add these in Vercel (Project → Settings → Environment Variables), Production
+   (and Preview if you want it on the beta site):
+   - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` = your cloud name
+   - `CLOUDINARY_API_KEY` = your key (server-only)
+   - `CLOUDINARY_API_SECRET` = your secret (server-only)
+5. Redeploy.
 
-## Adding / updating photos
+## Folder layout (match these names)
 
-Two ways — pick whichever you prefer:
+In the Cloudinary Media Library, create folders and upload images named to match
+the slots. The **public id** = folder + name (no extension).
 
-### A. Optimize locally, then upload (best quality + blur placeholders)
+| Folder / public id | Where it shows |
+| --- | --- |
+| `home/hero` | Home hero background |
+| `home/breeder-home` | Home intro photo |
+| `home/diff-puppy-culture`, `home/diff-health-tested`, `home/diff-ens` | Home "why families choose us" |
+| `about/about-portrait` | About page |
+| `parents/parent-dam`, `parents/parent-sire`, `parents/parent-3` | Meet the Parents (dam/sire also on Reserve) |
+| `alumni/alumni-luna`, `alumni/alumni-cooper`, `alumni/alumni-daisy` | Gallery "where they are now" |
+| `contact/contact-map` | Contact page |
+| `testimonials/testimonial-1` … `-4` | Testimonial photos |
+| `gallery/<anything>` | Photo gallery — **every** image in this folder shows, ordered by name |
 
-1. Put photos (or a whole WordPress dump) in `photos-src/` (gitignored).
-2. `npm run photos:catalog` → numbered contact sheets in `photo-catalog/`.
-3. Map slots to numbers in `photos.map.json`.
-4. `npm run photos` → optimized JPEGs land in `r2-upload/` (gitignored, ~2000px,
-   compressed) and dimensions + blur are written to `image-meta.generated.json`.
-5. Upload everything in `r2-upload/` to the bucket (drag-drop in the R2 dashboard,
-   or `rclone`/`aws s3 sync` with an R2 token).
-6. Commit `image-meta.generated.json` (and `photos.map.json`). Each processed slot
-   switches to its real photo automatically — no manifest edits. (Optionally tidy
-   the `alt` text in `src/lib/images.ts`.)
+> Cloudinary's "public id" is the folder path + the file's name without its
+> extension. Upload `hero.jpg` into a `home` folder and its public id is
+> `home/hero` — exactly what the site asks for.
 
-### The photo gallery (bulk, any number of photos)
+## Changing a photo
 
-The gallery page shows **every** gallery photo you add — not a fixed count. Add
-them in one command (no per-photo mapping):
+1. Open the Cloudinary **Media Library**.
+2. Go to the folder (e.g. `parents`) and **upload your new photo with the same
+   name** (`parent-dam`), overwriting the old one (choose "overwrite"/"replace"
+   when prompted). Cloudinary invalidates its cache automatically, so the change
+   shows within seconds — no purge, no redeploy.
 
-1. Put your gallery-worthy shots in a `gallery-src/` folder (gitignored).
-2. `npm run photos:gallery` → optimizes them into `r2-upload/gallery-1.jpg`,
-   `gallery-2.jpg`, … (numbered in filename order) with dimensions + blur.
-3. Upload `r2-upload/gallery-*.jpg` to the R2 bucket.
-4. Commit `image-meta.generated.json`. The gallery renders all of them
-   automatically, in order, with natural aspect ratios.
+Adding gallery photos is even simpler: drop any images into the `gallery` folder
+and they appear automatically, ordered by filename (prefix `01-`, `02-`, … to
+control order). Remove one from the folder and it disappears from the site.
 
-Re-running replaces the gallery set, so prefix filenames (`01-`, `02-`, …) if you
-want to control the order.
+## Notes
 
-#### Removing / re-curating gallery photos
-
-The gallery shows whatever `gallery-<n>.jpg` entries exist in the metadata, so
-removal is metadata-driven.
-
-- **Drop a few photos:** find their numbers in the gallery, then
-  ```bash
-  npm run photos:gallery:remove -- 5 12 27
-  git add src/lib/image-meta.generated.json && git commit -m "Remove gallery photos" && git push
-  ```
-  Gaps are fine — the gallery sorts the remaining numbers. The image left on R2 is
-  harmless; to delete it too: `rclone deletefile r2:carolina-cream-pups/gallery-5.jpg`.
-
-- **Re-curate in bulk:** change which photos are in `gallery-src/`, re-run
-  `npm run photos:gallery` (it clears and renumbers `gallery-*` from the folder),
-  `rclone copy r2-upload/ r2:carolina-cream-pups`, then commit the metadata. Files
-  from a previous larger run become harmless orphans on R2.
-
-> ⚠️ Don't run `rclone sync` against the bucket **root** — named-slot files
-> (`hero.jpg`, …) live there too, and a sync from a gallery-only `r2-upload/`
-> would delete them. Use `rclone copy` (adds/updates only).
-
-### Cleaning up duplicate sizes (optional)
-
-You don't need this for the website — the pipeline already ignores WordPress size
-variants. But to physically delete the duplicates from a folder (reclaim disk),
-run the safe deduper (dry-run by default):
-
-```bash
-npm run photos:dedupe -- photos-src            # preview what would be removed
-npm run photos:dedupe -- photos-src --delete   # actually delete
-```
-
-It keeps the largest original of each photo and removes `-WxH`/`-scaled`
-variants and `elementor`/`thumbs` caches. Work on a copy or keep a backup before
-using `--delete`.
-
-### B. Drag-drop straight to R2 (simplest, no local tooling)
-
-Upload images named after their slots (`hero.jpg`, `puppy-willow.jpg`, …) directly
-in the R2 dashboard. For a slot to switch over, it still needs a metadata entry —
-add `{ "hero.jpg": { "width": W, "height": H } }` to `image-meta.generated.json`
-(blur optional). You skip the local optimize step (Vercel still optimizes on
-delivery), but no blur-up placeholder. Upload reasonably sized images (≤ ~2500px),
-not 24‑megapixel originals.
-
-## Why this design
-
-Photos are content that changes often (new litters) and shouldn't ride through
-code commits or bloat the repo. Hosting them on R2 decouples media from deploys,
-costs pennies for the storage, and keeps git small — while `next/image` still
-gives responsive formats and lazy loading.
+- You can upload large originals; Cloudinary resizes and optimizes on delivery.
+- The cloud name is intentionally public (it's in every image URL). Keep the API
+  **secret** server-only — never prefix it with `NEXT_PUBLIC_`.
+- Instant gallery refresh: the gallery is cached for ~5 minutes (ISR). To force an
+  immediate refresh after adding photos, redeploy or hit the revalidate route
+  (the gallery uses the `gallery` cache tag).

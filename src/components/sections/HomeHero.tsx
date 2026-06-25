@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 import { Container, Heading, Button } from "@/components/ui";
 import type { HomeContent } from "@/lib/content-types";
 import styles from "./HomeHero.module.css";
@@ -6,17 +7,29 @@ import styles from "./HomeHero.module.css";
 export function HomeHero({ hero }: { hero: HomeContent["hero"] }) {
   return (
     <section className={styles.hero} aria-label="Welcome">
-      <Image
-        src={hero.image.src}
-        alt={hero.image.alt}
-        fill
-        priority
-        sizes="100vw"
-        unoptimized={hero.image.src.endsWith(".svg")}
-        placeholder={hero.image.blurDataURL ? "blur" : "empty"}
-        blurDataURL={hero.image.blurDataURL}
-        className={styles.img}
-      />
+      {hero.image.cloudinaryId ? (
+        <CldImage
+          src={hero.image.cloudinaryId}
+          alt={hero.image.alt}
+          fill
+          priority
+          sizes="100vw"
+          crop="fill"
+          gravity="auto"
+          placeholder="blur"
+          className={styles.img}
+        />
+      ) : (
+        <Image
+          src={hero.image.src}
+          alt={hero.image.alt}
+          fill
+          priority
+          sizes="100vw"
+          unoptimized={hero.image.src.endsWith(".svg")}
+          className={styles.img}
+        />
+      )}
       <div aria-hidden className={styles.scrim} />
       <Container className={styles.content}>
         <p className={styles.place}>{hero.place}</p>
