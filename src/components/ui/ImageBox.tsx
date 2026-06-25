@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import { CldImage } from "next-cloudinary";
 import type { ImageAsset } from "@/lib/images";
+import { CloudinaryImage } from "./CloudinaryImage";
 import styles from "./ImageBox.module.css";
 
 type Props = {
@@ -47,15 +47,11 @@ export function ImageBox({
   return (
     <div className={cls} style={{ aspectRatio: ratio, ...style }}>
       {image.cloudinaryId ? (
-        <CldImage
-          src={image.cloudinaryId}
+        <CloudinaryImage
+          publicId={image.cloudinaryId}
           alt={image.alt}
-          fill
           sizes={sizes}
           priority={priority}
-          crop="fill"
-          gravity="auto"
-          placeholder="blur"
           className={styles.img}
         />
       ) : (
