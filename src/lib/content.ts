@@ -102,47 +102,47 @@ export async function getAboutContent(): Promise<AboutContent> {
 export async function getGoingHomeContent(): Promise<GoingHomeContent> {
   return {
     eyebrow: "Going home",
-    heading: "What comes home with your puppy — and how to be ready.",
+    heading: "What comes home with your puppy, and how to be ready.",
     intro:
-      "Bringing a puppy home is a big day. Here's exactly what your puppy leaves with, what to have ready before pickup, and how we support you through the first weeks and beyond.",
+      "Bringing a puppy home is a big day. Here's what your puppy leaves with, what to have ready before pickup, and how we help you through the first weeks.",
     included: {
       eyebrow: "What's included",
       heading: "Every puppy goes home at eight weeks with:",
       items: [
         {
           title: "Vet check & vaccinations",
-          body: "A full vet health exam, age-appropriate vaccinations, and deworming — with records you can hand straight to your own vet.",
+          body: "A full vet exam, age-appropriate vaccinations, and deworming, with records you can hand straight to your own vet.",
         },
         {
           title: "Microchip",
-          body: "Registered and ready to update to your contact details, so your puppy can always find its way home.",
+          body: "Registered and ready to update to your details, so your puppy can always find its way home.",
         },
         {
           title: "AKC registration paperwork",
-          body: "Registration application and your puppy's pedigree, plus a copy of the parents' health clearances.",
+          body: "The registration application and your puppy's pedigree, plus a copy of the parents' health clearances.",
         },
         {
           title: "One-year genetic health guarantee",
-          body: "Written coverage for serious hereditary or congenital conditions. (See the full terms in your sales agreement.)",
+          body: "Written coverage for serious hereditary or congenital conditions. (The full terms are in your sales agreement.)",
         },
         {
           title: "Go-home starter kit",
-          body: "A bag of the food your puppy is already eating, a blanket that smells like home and littermates, and a favorite toy.",
+          body: "A bag of the food your puppy is already eating, a blanket that smells like home, and a favorite toy.",
         },
         {
           title: "Puppy Culture head start",
-          body: "Eight weeks of socialization, early potty and crate work, and gentle handling — so your puppy arrives confident and ready to learn.",
+          body: "Eight weeks of socialization, early potty and crate work, and gentle handling, so your puppy arrives ready to learn.",
         },
       ],
     },
     prepare: {
       eyebrow: "Before pickup",
       heading: "A short list to have ready at home.",
-      body: "You don't need much — just the basics, set up before your puppy walks in the door so the first day is calm.",
+      body: "You don't need much. Just get the basics set up before your puppy walks in the door so the first day stays calm.",
       steps: [
         { head: "A safe space", body: "A crate and a small gated area for naps, meals, and downtime." },
-        { head: "Food & bowls", body: "We'll tell you the exact food; keep them on it to start, then transition slowly." },
-        { head: "Potty plan", body: "Pick a potty spot and a schedule. Young puppies go out often — and right after meals and naps." },
+        { head: "Food & bowls", body: "We'll tell you the exact food. Keep them on it to start, then switch over slowly." },
+        { head: "Potty plan", body: "Pick a potty spot and a schedule. Young puppies need to go out often, and right after meals and naps." },
         { head: "Vet appointment", body: "Book a wellness visit within the first few days, as the health guarantee asks." },
       ],
     },
@@ -150,21 +150,21 @@ export async function getGoingHomeContent(): Promise<GoingHomeContent> {
       eyebrow: "The first days home",
       heading: "Go slow, keep it calm, and let your puppy settle.",
       paragraphs: [
-        "The first few days are about decompression, not training. Keep things quiet, limit visitors, and let your puppy explore one room at a time. Short, positive moments beat long, exciting ones.",
-        "Expect a couple of unsettled nights — that's normal. A crate near your bed, a warm blanket, and a consistent bedtime routine help your puppy feel secure. Within a week, most puppies are sleeping through and finding their rhythm.",
-        "Stick to the feeding schedule and potty routine, and reach out to us anytime. We've raised this litter from day one and we're always glad to help.",
+        "The first few days are about settling in, not training. Keep things quiet, limit visitors, and let your puppy explore one room at a time. Short, happy moments beat long, exciting ones.",
+        "Expect a couple of unsettled nights. That's normal. A crate near your bed, a warm blanket, and the same bedtime routine each night help your puppy feel safe. Most are sleeping through within a week.",
+        "Stick to the feeding and potty routine, and reach out to us anytime. We've raised this litter from day one and we're always glad to help.",
       ],
       image: images.diffHealthTested,
     },
     support: {
       eyebrow: "We don't disappear",
-      heading: "Lifetime breeder support.",
-      body: "Questions about food, training, vet care, or just want to share a photo? We're a text away — for the whole life of your dog. If your circumstances ever change, your puppy always has a place to come back to.",
+      heading: "Support for the life of your dog.",
+      body: "Questions about food, training, or vet care, or just want to share a photo? We're a text away, for as long as you have your dog. And if life ever changes, your puppy always has a place to come back to.",
     },
     cta: {
       eyebrow: "Ready when you are",
       heading: "Have a question about bringing one home?",
-      body: "We're happy to walk you through what to expect and help you get ready.",
+      body: "We're glad to walk you through what to expect and help you get ready.",
       cta: { label: "Get in touch", href: "/contact" },
     },
   };
@@ -261,6 +261,7 @@ export async function getParentsContent(): Promise<ParentsContent> {
 }
 
 export async function getGallery(): Promise<GalleryContent> {
+  const gallery = await galleryImages();
   return {
     eyebrow: "Photo gallery",
     heading: "Our pups, and where they are now.",
@@ -269,10 +270,10 @@ export async function getGallery(): Promise<GalleryContent> {
     litter: {
       title: "Our pups",
       born: "",
-      // Renders every gallery photo uploaded (any count); ratio comes from each
-      // photo's real dimensions so the masonry stays natural. Falls back to the
-      // placeholder grid until real gallery photos are added.
-      images: galleryImages().map((image) => ({
+      // Renders every gallery photo in the Cloudinary "gallery" folder (any
+      // count); ratio comes from each photo's real dimensions so the masonry
+      // stays natural. Falls back to the placeholder grid until photos are added.
+      images: gallery.map((image) => ({
         image,
         ratio: `${image.width}/${image.height}`,
       })),

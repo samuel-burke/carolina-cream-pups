@@ -18,5 +18,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   revalidateTag("reserve");
-  return NextResponse.json({ revalidated: true, tag: "reserve" });
+  revalidateTag("gallery");
+  return NextResponse.json({ revalidated: true, tags: ["reserve", "gallery"] });
 }

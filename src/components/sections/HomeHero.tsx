@@ -1,22 +1,33 @@
 import Image from "next/image";
 import { Container, Heading, Button } from "@/components/ui";
+import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
+import { resolvePublicId } from "@/lib/cloudinary";
 import type { HomeContent } from "@/lib/content-types";
 import styles from "./HomeHero.module.css";
 
-export function HomeHero({ hero }: { hero: HomeContent["hero"] }) {
+export async function HomeHero({ hero }: { hero: HomeContent["hero"] }) {
+  const resolved = hero.image.cloudinaryId ? await resolvePublicId(hero.image.cloudinaryId) : null;
   return (
     <section className={styles.hero} aria-label="Welcome">
-      <Image
-        src={hero.image.src}
-        alt={hero.image.alt}
-        fill
-        priority
-        sizes="100vw"
-        unoptimized={hero.image.src.endsWith(".svg")}
-        placeholder={hero.image.blurDataURL ? "blur" : "empty"}
-        blurDataURL={hero.image.blurDataURL}
-        className={styles.img}
-      />
+      {resolved ? (
+        <CloudinaryImage
+          publicId={resolved.publicId}
+          alt={hero.image.alt}
+          priority
+          sizes="100vw"
+          className={styles.img}
+        />
+      ) : (
+        <Image
+          src={hero.image.src}
+          alt={hero.image.alt}
+          fill
+          priority
+          sizes="100vw"
+          unoptimized={hero.image.src.endsWith(".svg")}
+          className={styles.img}
+        />
+      )}
       <div aria-hidden className={styles.scrim} />
       <Container className={styles.content}>
         <p className={styles.place}>{hero.place}</p>

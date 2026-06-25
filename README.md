@@ -79,20 +79,17 @@ Stable, non-editable config (brand/business info, navigation, SEO) stays in
 
 ## Images
 
-Real photos are hosted on a **Cloudflare R2 CDN** (not in git) and served via
-`next/image` (`ImageBox`), which lazy-loads, serves responsive AVIF/WebP, and
-shows a blur-up placeholder. Only the hero is `priority`; everything else is lazy.
+Real photos are hosted on **Cloudinary** and served with `<CldImage>`
+(`next-cloudinary`), which lazy-loads, serves responsive AVIF/WebP, and shows a
+blur-up placeholder automatically. Only the hero is `priority`; everything else
+is lazy.
 
-Each slot is registered in `src/lib/images.ts` by name (e.g. `slot("hero", …)`)
-and resolves **automatically**: it serves the optimized R2 photo once that
-photo's metadata exists (and `NEXT_PUBLIC_IMAGE_BASE_URL` is set), otherwise it
-shows the local SVG placeholder. So adding photos needs **no manifest edits** —
-run the pipeline, upload, commit the metadata, and each slot switches itself.
-
-The pipeline (`npm run photos:catalog` → fill `photos.map.json` → `npm run photos`)
-handles WordPress dumps, sizing, compression, and blur metadata, staging files in
-`r2-upload/` for upload to the bucket. The gallery is bulk-managed with
-`npm run photos:gallery` (add) and `npm run photos:gallery:remove -- 5 12` (remove).
+Each slot is registered in `src/lib/images.ts` by Cloudinary public id (e.g.
+`slot("home/hero", …)`) and resolves **automatically**: it serves the Cloudinary
+photo when `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is set, otherwise the local SVG
+placeholder. **Changing a photo is drag-and-drop** in the Cloudinary Media
+Library — no code, no commit, no cache purge. The gallery shows every image in
+the `gallery` folder, so adding gallery photos is just uploading to that folder.
 
 **Full setup and workflow: [`docs/IMAGES.md`](docs/IMAGES.md).**
 
@@ -127,7 +124,7 @@ automatically, no tokens or secrets.
 
 GitHub Actions runs the `verify` check (lint/typecheck/test/build); require it via
 branch protection on `main` so production only builds from green code.
-`NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_IMAGE_BASE_URL`, and `NEXT_PUBLIC_NOINDEX`
-are set per-environment in Vercel. Full one-time setup (project import, env vars,
+`NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, and
+`NEXT_PUBLIC_NOINDEX` are set per-environment in Vercel. Full one-time setup (project import, env vars,
 domains, branch protection) is in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). The
 site also runs on any Node host via `npm run build && npm run start`.

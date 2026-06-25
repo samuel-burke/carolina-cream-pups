@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { ImageAsset } from "@/lib/images";
+import { resolvePublicId } from "@/lib/cloudinary";
+import { CloudinaryImage } from "./CloudinaryImage";
 import styles from "./ImageBox.module.css";
 
 type Props = {
@@ -20,11 +22,11 @@ type Props = {
 };
 
 /**
- * Aspect-ratio image frame backed by next/image. Local SVG placeholders are
- * served unoptimized; real raster photos dropped into /public are optimized
- * (AVIF/WebP) automatically.
+ * Aspect-ratio image frame. Real photos render through Cloudinary (<CldImage> —
+ * responsive AVIF/WebP, blur-up, CDN cache); when Cloudinary isn't configured,
+ * the local SVG placeholder is shown via next/image.
  */
-export function ImageBox({
+export async function ImageBox({
   image,
   ratio = "4/3",
   keyline = true,
@@ -34,7 +36,8 @@ export function ImageBox({
   className,
   style,
 }: Props) {
-  const isSvg = image.src.endsWith(".svg");
+  // Resolve the real Cloudinary public id (handles the upload suffix + folder).
+  const resolved = image.cloudinaryId ? await resolvePublicId(image.cloudinaryId) : null;
   const cls = [
     styles.frame,
     keyline ? styles.keyline : styles.plainLine,
@@ -46,17 +49,25 @@ export function ImageBox({
 
   return (
     <div className={cls} style={{ aspectRatio: ratio, ...style }}>
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        unoptimized={isSvg}
-        placeholder={image.blurDataURL ? "blur" : "empty"}
-        blurDataURL={image.blurDataURL}
-        className={styles.img}
-      />
+      {resolved ? (
+        <CloudinaryImage
+          publicId={resolved.publicId}
+          alt={image.alt}
+          sizes={sizes}
+          priority={priority}
+          className={styles.img}
+        />
+      ) : (
+        <Image
+          src={image.src}
+          alt={image.alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          unoptimized={image.src.endsWith(".svg")}
+          className={styles.img}
+        />
+      )}
     </div>
   );
 }
