@@ -3,17 +3,18 @@ import { Section, Grid, Eyebrow, Heading, Text, Button, Card, ImageBox, Steps } 
 import { WaitlistCard } from "@/components/sections/WaitlistCard";
 import { Faq } from "@/components/sections/Faq";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { FaqJsonLd } from "@/components/seo/FaqJsonLd";
 import { getFaqs, getReserve } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Reserve a Puppy",
   description:
-    "Reserve an English Cream Golden Retriever by joining our male or female waitlist. See the current litter, its parents, and each list's status — your position is your pick order.",
+    "Reserve an English Cream Golden Retriever by joining our male or female waitlist. See the current litter, its parents, and where each list stands. Your position is your pick order.",
   alternates: { canonical: "/reserve" },
 };
 
 const process = [
-  { head: "Apply", body: "Tell us about your home. No deposit to apply — it just helps us find the right fit." },
+  { head: "Apply", body: "Tell us about your home. There's no deposit to apply; it just helps us find the right fit." },
   { head: "Join a list", body: "Choose the male or female waitlist; a deposit holds your numbered spot in line." },
   { head: "Litter arrives", body: "When the puppies are born, we contact families in list order as their turn comes up." },
   { head: "Pick & go home", body: "1st on the male list gets first pick of the males (same for females). Puppies go home at 8 weeks." },
@@ -27,6 +28,7 @@ export default async function ReservePage() {
   return (
     <>
       <Breadcrumbs href="/reserve" />
+      <FaqJsonLd faqs={faqs} />
       <Section>
         <Eyebrow>Reserve a puppy</Eyebrow>
         <Heading level={1}>Join the waitlist.</Heading>

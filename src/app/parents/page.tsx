@@ -7,7 +7,7 @@ import { getParentsContent } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Meet the Parents",
   description:
-    "Meet the dam and sire behind our English Cream Golden Retriever puppies — health clearances (OFA hips, elbows, heart, eyes) and temperament you can verify.",
+    "Meet the dam and sire behind our English Cream Golden Retriever puppies, with health clearances (OFA hips, elbows, heart, eyes) and temperament you can verify.",
   alternates: { canonical: "/parents" },
 };
 
@@ -69,7 +69,7 @@ export default async function ParentsPage() {
           </ul>
           <div>
             <Text style={{ fontWeight: 600 }}>Verify our dogs</Text>
-            <ul style={{ listStyle: "none", margin: "0.5rem 0 0", padding: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            <ul role="list" style={{ listStyle: "none", margin: "0.5rem 0 0", padding: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               {content.health.links.map((l) => (
                 <li key={l.href}>
                   <a
@@ -78,7 +78,7 @@ export default async function ParentsPage() {
                     rel="noopener noreferrer"
                     style={{ color: "var(--color-sage-deep)", fontWeight: 600, borderBottom: "1px solid var(--color-sage)" }}
                   >
-                    {l.label} →
+                    {l.label} →<span className="sr-only"> (opens in a new tab)</span>
                   </a>
                 </li>
               ))}

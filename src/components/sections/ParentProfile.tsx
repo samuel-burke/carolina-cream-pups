@@ -40,14 +40,14 @@ export function ParentProfile({
 
         {verifyUrl ? (
           <a className={styles.verify} href={verifyUrl} target="_blank" rel="noopener noreferrer">
-            Verify on OFA →
+            Verify on OFA →<span className="sr-only"> (opens in a new tab)</span>
           </a>
         ) : null}
 
         {titles && titles.length > 0 ? (
           <div className={styles.titles}>
             <span className={styles.titlesLabel}>Titles &amp; accomplishments</span>
-            <ul className={styles.badges}>
+            <ul className={styles.badges} role="list">
               {titles.map((t) => (
                 <li key={t} className={styles.badge}>
                   {t}

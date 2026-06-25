@@ -3,15 +3,16 @@ import { Section, Grid, Eyebrow, Heading, Text, Card, ImageBox } from "@/compone
 import { ContactForm } from "@/components/sections/ContactForm";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { images } from "@/lib/images";
-import { site } from "@/lib/site";
+import { site, socialLinks } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Get in touch with ${site.name} in ${site.location.city}, ${site.location.region}. We typically reply within a day and are always happy to arrange a visit to meet the dogs.`,
+  description: `Get in touch with ${site.name} in ${site.location.city}, ${site.location.region}. We usually reply within a day and are always glad to set up a visit to meet the dogs.`,
   alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {
+  const socials = socialLinks();
   return (
     <>
       <Breadcrumbs href="/contact" />
@@ -33,6 +34,20 @@ export default function ContactPage() {
             <Text muted style={{ marginTop: "0.5rem" }}>
               <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
             </Text>
+            {site.contact.phone ? (
+              <Text muted style={{ marginTop: "0.5rem" }}>
+                <a href={`tel:${site.contact.phone}`}>{site.contact.phone}</a>
+              </Text>
+            ) : null}
+            {socials.length > 0 ? (
+              <div style={{ display: "flex", gap: "1rem", marginTop: "0.75rem" }}>
+                {socials.map((s) => (
+                  <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer">
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
             <div
               style={{
                 marginTop: "1.5rem",
@@ -43,8 +58,8 @@ export default function ContactPage() {
             >
               <Text style={{ fontWeight: 600 }}>We&apos;re real people, and we answer.</Text>
               <Text muted style={{ marginTop: "0.5rem", fontSize: "var(--size-sm)" }}>
-                We typically reply within a day. We&apos;re always happy to talk, answer questions,
-                and arrange a visit to meet the dogs before you decide.
+                We usually reply within a day, and we&apos;re always glad to talk things through or
+                set up a visit to meet the dogs before you decide.
               </Text>
             </div>
             <ImageBox

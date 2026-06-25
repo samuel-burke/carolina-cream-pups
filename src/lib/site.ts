@@ -26,13 +26,27 @@ export const site = {
   breed: "English Cream Golden Retriever",
   contact: {
     email: "hello@carolinacreampups.com",
-    // Add real handles when available; empty entries are skipped in the UI.
+    // Optional phone — shown + added to structured data when set.
+    phone: "",
+    // Full profile URLs when available; empty entries are skipped everywhere.
     social: {
       instagram: "",
       facebook: "",
     },
   },
 } as const;
+
+/** Non-empty social profiles as {label, href} — used in the footer, contact
+ * page, and the JSON-LD `sameAs`. Add URLs in `site.contact.social` to surface. */
+export function socialLinks(): { label: string; href: string }[] {
+  const s = site.contact.social;
+  return (
+    [
+      { label: "Instagram", href: s.instagram as string },
+      { label: "Facebook", href: s.facebook as string },
+    ] as { label: string; href: string }[]
+  ).filter((l) => l.href.length > 0);
+}
 
 /**
  * When true, the site asks search engines not to index it. Set
@@ -48,7 +62,20 @@ export const nav: NavItem[] = [
   { href: "/about", label: "About Us" },
   { href: "/parents", label: "Meet the Parents" },
   { href: "/reserve", label: "Reserve a Puppy" },
+  { href: "/going-home", label: "Going Home" },
   { href: "/gallery", label: "Photo Gallery" },
   { href: "/testimonials", label: "Testimonials" },
   { href: "/contact", label: "Contact" },
+];
+
+/**
+ * Secondary pages — shown in the footer and included in the sitemap, but kept out
+ * of the header nav to avoid crowding it.
+ */
+export const secondaryNav: NavItem[] = [{ href: "/faq", label: "FAQ" }];
+
+/** Secondary / legal links — shown in the footer, not the primary header. */
+export const legalNav: NavItem[] = [
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Terms of Use" },
 ];

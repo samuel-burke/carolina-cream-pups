@@ -8,7 +8,7 @@ import { getTestimonials } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Testimonials",
   description:
-    "What families say about their English Cream Golden Retrievers from Carolina Cream Pups — temperament, health, and lifetime breeder support.",
+    "What families say about their English Cream Golden Retrievers from Carolina Cream Pups, from temperament and health to support that lasts.",
   alternates: { canonical: "/testimonials" },
 };
 
@@ -40,7 +40,7 @@ export default async function TestimonialsPage() {
         <Eyebrow>Ready when you are</Eyebrow>
         <Heading level={2}>Join a waitlist for an upcoming litter.</Heading>
         <Text muted style={{ marginTop: "0.75rem", maxWidth: 460 }}>
-          A short application helps us match the right puppy to your home. No deposit to apply.
+          Fill out a short application and we&apos;ll help match the right puppy to your home. There&apos;s no deposit to apply.
         </Text>
         <div style={{ marginTop: "1.5rem" }}>
           <Button href="/reserve">See the waitlists</Button>

@@ -6,7 +6,7 @@ import { getAboutContent } from "@/lib/content";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "How we raise our English Cream Golden Retrievers — in our home, with our family, following an intentional eight-week head start for every puppy.",
+    "How we raise our English Cream Golden Retrievers at home with our family, giving every puppy the same eight-week head start.",
   alternates: { canonical: "/about" },
 };
 

@@ -26,6 +26,13 @@ const nextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          // Tell browsers to always use HTTPS for two years, including
+          // subdomains; eligible for the HSTS preload list.
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          { key: "X-DNS-Prefetch-Control", value: "on" },
         ],
       },
     ];
