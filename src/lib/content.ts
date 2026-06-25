@@ -261,6 +261,7 @@ export async function getParentsContent(): Promise<ParentsContent> {
 }
 
 export async function getGallery(): Promise<GalleryContent> {
+  const gallery = await galleryImages();
   return {
     eyebrow: "Photo gallery",
     heading: "Our pups, and where they are now.",
@@ -269,10 +270,10 @@ export async function getGallery(): Promise<GalleryContent> {
     litter: {
       title: "Our pups",
       born: "",
-      // Renders every gallery photo uploaded (any count); ratio comes from each
-      // photo's real dimensions so the masonry stays natural. Falls back to the
-      // placeholder grid until real gallery photos are added.
-      images: galleryImages().map((image) => ({
+      // Renders every gallery photo in the Cloudinary "gallery" folder (any
+      // count); ratio comes from each photo's real dimensions so the masonry
+      // stays natural. Falls back to the placeholder grid until photos are added.
+      images: gallery.map((image) => ({
         image,
         ratio: `${image.width}/${image.height}`,
       })),

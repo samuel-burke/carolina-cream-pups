@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 import type { ImageAsset } from "@/lib/images";
 import styles from "./ImageBox.module.css";
 
@@ -20,9 +21,9 @@ type Props = {
 };
 
 /**
- * Aspect-ratio image frame backed by next/image. Local SVG placeholders are
- * served unoptimized; real raster photos dropped into /public are optimized
- * (AVIF/WebP) automatically.
+ * Aspect-ratio image frame. Real photos render through Cloudinary (<CldImage> —
+ * responsive AVIF/WebP, blur-up, CDN cache); when Cloudinary isn't configured,
+ * the local SVG placeholder is shown via next/image.
  */
 export function ImageBox({
   image,
@@ -34,7 +35,6 @@ export function ImageBox({
   className,
   style,
 }: Props) {
-  const isSvg = image.src.endsWith(".svg");
   const cls = [
     styles.frame,
     keyline ? styles.keyline : styles.plainLine,
@@ -46,17 +46,29 @@ export function ImageBox({
 
   return (
     <div className={cls} style={{ aspectRatio: ratio, ...style }}>
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        unoptimized={isSvg}
-        placeholder={image.blurDataURL ? "blur" : "empty"}
-        blurDataURL={image.blurDataURL}
-        className={styles.img}
-      />
+      {image.cloudinaryId ? (
+        <CldImage
+          src={image.cloudinaryId}
+          alt={image.alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          crop="fill"
+          gravity="auto"
+          placeholder="blur"
+          className={styles.img}
+        />
+      ) : (
+        <Image
+          src={image.src}
+          alt={image.alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          unoptimized={image.src.endsWith(".svg")}
+          className={styles.img}
+        />
+      )}
     </div>
   );
 }

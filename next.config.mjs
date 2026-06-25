@@ -1,10 +1,6 @@
-// Allow next/image to optimize photos served from the image CDN (Cloudflare R2
-// or any host), derived from NEXT_PUBLIC_IMAGE_BASE_URL so nothing is hardcoded.
-// Unset = images load locally from /public/images (placeholders / dev).
-const imageBase = process.env.NEXT_PUBLIC_IMAGE_BASE_URL;
-const remotePatterns = imageBase
-  ? [{ protocol: new URL(imageBase).protocol.replace(":", ""), hostname: new URL(imageBase).hostname }]
-  : [];
+// Real photos are delivered by Cloudinary via <CldImage> (next-cloudinary),
+// which uses its own loader — so no next/image remotePatterns are needed. Local
+// SVG placeholders are served from /public when Cloudinary isn't configured.
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -12,7 +8,6 @@ const nextConfig = {
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
-    remotePatterns,
   },
   async headers() {
     return [
