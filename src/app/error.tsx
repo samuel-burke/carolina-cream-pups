@@ -19,7 +19,7 @@ export default function Error({
     <Section>
       <Eyebrow>Something went wrong</Eyebrow>
       <Heading level={1} style={{ maxWidth: 600 }}>
-        Sorry — something broke on our end.
+        Sorry, something broke on our end.
       </Heading>
       <Text muted style={{ marginTop: "1rem", maxWidth: 520 }}>
         Please try again. If it keeps happening, reach out and we&apos;ll help.

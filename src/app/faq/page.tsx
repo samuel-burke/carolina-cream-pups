@@ -7,7 +7,7 @@ import { getFaqs } from "@/lib/content";
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Answers to common questions about reserving an English Cream Golden Retriever from Carolina Cream Pups — waitlists, health testing, what's included, and going home.",
+    "Answers to common questions about reserving an English Cream Golden Retriever from Carolina Cream Pups, including waitlists, health testing, what's included, and going home.",
   alternates: { canonical: "/faq" },
 };
 
