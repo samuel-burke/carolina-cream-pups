@@ -1,45 +1,44 @@
-# Images (Cloudinary)
+# Images (Cloudinary) — upload and done
 
-Photos are hosted on **Cloudinary** and rendered with `<CldImage>`
-(`next-cloudinary`), which automatically does responsive sizing, AVIF/WebP,
-blur-up placeholders, and CDN caching. **Changing a photo is drag-and-drop** in
-the Cloudinary Media Library — no code, no git, no cache purging.
+Photos live in **Cloudinary** and render through `<CldImage>` (`next-cloudinary`):
+responsive AVIF/WebP, subject-aware cropping, blur-up previews, and CDN caching
+are all automatic. You never crop, resize, or compress anything — upload any
+photo at any size and the site handles the rest.
 
-When Cloudinary isn't configured (local dev / CI), every image falls back to the
-local SVG placeholder in `/public/images`, so the site always builds.
+The only configuration is the **cloud name** (`NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`).
+There is no API key or secret. When the cloud name is unset (local dev / CI), or a
+photo hasn't been uploaded yet, the site shows the beige SVG placeholder instead —
+nothing ever breaks.
 
-## How it fits together
+## One-time Cloudinary setup (do this once)
 
-- `src/lib/images.ts` — the manifest. Each slot maps a key (e.g. `heroHome`) to a
-  Cloudinary **public id** in a page folder (e.g. `home/hero`). It serves the
-  Cloudinary photo when `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is set, else the local
-  placeholder. No edits needed to swap a photo.
-- `src/lib/cloudinary.ts` — lists the `gallery` folder so the gallery page shows
-  whatever you've uploaded (server-only; uses the API key/secret).
-- `ImageBox` / `HomeHero` — render `<CldImage>` for real photos, `next/image`
-  for placeholders.
+1. **Make filenames the photo's identity.** In Cloudinary: **Settings → Upload**
+   and edit the upload preset the Media Library uses (usually `ml_default`):
+   - "Use filename as public ID" (or *Public ID generation: filename*): **ON**
+   - "Unique filename" (the random suffix, e.g. `hero_gq2zgp`): **OFF**
 
-## One-time setup
+   After this, uploading `hero.jpg` stores it as exactly `hero` — which is what
+   the site looks for. *(Without this, uploads get random suffixes and won't match.)*
 
-1. Create a free account at [cloudinary.com](https://cloudinary.com).
-2. Find your **cloud name** (Dashboard → Product Environment / top of the page).
-3. Create an **API key + secret** (Settings → API Keys). **Required:** Cloudinary
-   adds a random suffix to uploads (`hero` → `hero_gq2zgp`), so the site looks up
-   each photo by name via the API rather than guessing the URL.
-4. Add these in Vercel (Project → Settings → Environment Variables), Production
-   **and Preview** (the `dev`/beta site needs them too):
+2. **Allow the public gallery list.** **Settings → Security → Restricted media
+   types**: make sure **"Resource list" is NOT restricted** (uncheck it). This
+   lets the site fetch the list of photos tagged `gallery` — it exposes only
+   names and sizes of those tagged images, nothing else.
+
+3. **Set the env var in Vercel** (Project → Settings → Environment Variables,
+   on **both Production and Preview**):
    - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` = your cloud name
-   - `CLOUDINARY_API_KEY` = your key (server-only)
-   - `CLOUDINARY_API_SECRET` = your secret (server-only)
-5. Redeploy.
+   - (You can delete `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, and the old
+     `NEXT_PUBLIC_IMAGE_BASE_URL` if they're still there — no longer used.)
 
-## Naming (this is what matters)
+4. **Redeploy.**
 
-The site finds each photo by its **name** (the filename you upload, without the
-extension), ignoring Cloudinary's random suffix. **Folders are just for your own
-organization** — you can use them or not; only the name has to match.
+## What to name each photo
 
-| Upload a photo named… | Where it shows |
+Upload files with these names (any folder, any image format — only the name
+matters):
+
+| Filename | Where it shows |
 | --- | --- |
 | `hero` | Home hero background |
 | `breeder-home` | Home intro photo |
@@ -49,31 +48,31 @@ organization** — you can use them or not; only the name has to match.
 | `alumni-luna`, `alumni-cooper`, `alumni-daisy` | Gallery "where they are now" |
 | `contact-map` | Contact page |
 | `testimonial-1` … `testimonial-4` | Testimonial photos |
-| anything in a **`gallery`** folder | Photo gallery — every image there shows, ordered by name |
 
-> Example: drag `hero.jpg` into the Media Library (any folder). Its name is
-> `hero`, so it becomes the home hero — even though Cloudinary stores it as
-> `hero_ab12cd`. To use folders for tidiness, put the gallery photos in a folder
-> literally named `gallery`.
+**The photo gallery** works by tag instead of names: upload any photos, select
+them in the Media Library, and add the tag **`gallery`**. Every tagged photo
+shows on the gallery page, ordered by filename (prefix `01-`, `02-`, … to control
+order). Remove the tag (or the photo) and it disappears from the site.
 
 ## Changing a photo
 
 1. Open the Cloudinary **Media Library**.
-2. **Upload your new photo with the same name** (e.g. `parent-dam`), overwriting
-   the old one (choose "replace" when prompted), or delete the old one and upload
-   the new. The site picks it up automatically — names are matched, suffix and
-   all. Changes appear within ~5 minutes (or instantly if you hit the revalidate
-   webhook).
+2. Click the photo → **Replace** it with the new file (this keeps the name and
+   clears Cloudinary's cache automatically). Or delete it and upload a new file
+   with the same filename.
+3. The site picks it up within ~5 minutes. To make it instant, hit the
+   revalidate webhook: `POST /api/revalidate?secret=YOUR_SECRET`.
 
-Adding gallery photos is even simpler: drop any images into the `gallery` folder
-and they appear automatically, ordered by filename (prefix `01-`, `02-`, … to
-control order). Remove one from the folder and it disappears from the site.
+That's the whole workflow — no code, no git, no cropping, no cache purging.
 
-## Notes
+## How it works (for developers)
 
-- You can upload large originals; Cloudinary resizes and optimizes on delivery.
-- The cloud name is intentionally public (it's in every image URL). Keep the API
-  **secret** server-only — never prefix it with `NEXT_PUBLIC_`.
-- Instant gallery refresh: the gallery is cached for ~5 minutes (ISR). To force an
-  immediate refresh after adding photos, redeploy or hit the revalidate route
-  (the gallery uses the `gallery` cache tag).
+- `src/lib/images.ts` — the slot manifest: each key maps to a Cloudinary public
+  id (= the filename). Falls back to `/public/images/<name>.svg` placeholders.
+- `src/lib/cloudinary.ts` — fetches a ~1KB blurred rendition of each photo
+  server-side (ISR-cached) to power next/image's blur-up; a 404 on that fetch
+  doubles as "photo not uploaded yet", triggering the placeholder. The gallery
+  uses Cloudinary's public tag list (`/image/list/gallery.json`).
+- `ImageBox` / `HomeHero` — async server components that render `<CldImage>`
+  (via the `CloudinaryImage` client wrapper) for real photos, or `next/image`
+  for placeholders.

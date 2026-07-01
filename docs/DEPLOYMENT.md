@@ -30,7 +30,6 @@ Project → **Settings → Environment Variables**:
 | ---------------------------- | ------------------------------- | ------------------------------------ |
 | `NEXT_PUBLIC_SITE_URL`       | `https://carolinacreampups.com` | `https://beta.carolinacreampups.com` |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | your cloud name          | your cloud name                      |
-| `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | your key/secret (server-only) | your key/secret |
 | `NEXT_PUBLIC_NOINDEX`        | _(unset)_                       | `1`                                  |
 
 `NEXT_PUBLIC_NOINDEX=1` on Preview makes `dev`/PR deploys serve

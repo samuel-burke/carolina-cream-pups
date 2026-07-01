@@ -3,9 +3,11 @@
 import { CldImage } from "next-cloudinary";
 
 type Props = {
-  /** Cloudinary public id, e.g. "home/hero". */
+  /** Cloudinary public id (the uploaded filename, e.g. "hero"). */
   publicId: string;
   alt: string;
+  /** Server-generated tiny preview for the blur-up effect. */
+  blurDataURL?: string;
   sizes?: string;
   priority?: boolean;
   className?: string;
@@ -15,12 +17,12 @@ type Props = {
  * Thin client-component wrapper around next-cloudinary's <CldImage>.
  *
  * CldImage uses React hooks, so it must live behind a "use client" boundary —
- * rendering it directly from a Server Component pushes its hooks into the RSC
- * runtime and crashes prerendering ("useState is not a function"). Always fills
- * its parent (the aspect-ratio frame controls the size); Cloudinary handles
- * responsive sizing, AVIF/WebP, blur-up, and CDN caching.
+ * rendering it directly from a Server Component crashes prerendering. Always
+ * fills its parent (the aspect-ratio frame controls the size); crop="fill" with
+ * gravity="auto" keeps the subject centered no matter the upload's shape, so
+ * photos never need manual cropping or resizing.
  */
-export function CloudinaryImage({ publicId, alt, sizes, priority, className }: Props) {
+export function CloudinaryImage({ publicId, alt, blurDataURL, sizes, priority, className }: Props) {
   return (
     <CldImage
       src={publicId}
@@ -30,7 +32,8 @@ export function CloudinaryImage({ publicId, alt, sizes, priority, className }: P
       priority={priority}
       crop="fill"
       gravity="auto"
-      placeholder="blur"
+      placeholder={blurDataURL ? "blur" : "empty"}
+      blurDataURL={blurDataURL}
       className={className}
     />
   );

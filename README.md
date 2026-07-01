@@ -84,12 +84,13 @@ Real photos are hosted on **Cloudinary** and served with `<CldImage>`
 blur-up placeholder automatically. Only the hero is `priority`; everything else
 is lazy.
 
-Each slot is registered in `src/lib/images.ts` by Cloudinary public id (e.g.
-`slot("home/hero", …)`) and resolves **automatically**: it serves the Cloudinary
-photo when `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is set, otherwise the local SVG
-placeholder. **Changing a photo is drag-and-drop** in the Cloudinary Media
-Library — no code, no commit, no cache purge. The gallery shows every image in
-the `gallery` folder, so adding gallery photos is just uploading to that folder.
+Each slot is registered in `src/lib/images.ts` by filename (e.g. `slot("hero", …)`)
+and resolves **automatically**: it serves the Cloudinary photo when
+`NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is set and the photo exists, otherwise the
+local SVG placeholder. The cloud name is the **only** image config — no API keys.
+**Changing a photo is drag-and-drop** in the Cloudinary Media Library (upload a
+file with the matching name) — no code, no commit, no cache purge, no cropping.
+The gallery shows every photo tagged `gallery`, so managing it is upload + tag.
 
 **Full setup and workflow: [`docs/IMAGES.md`](docs/IMAGES.md).**
 
