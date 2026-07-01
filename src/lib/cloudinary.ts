@@ -1,177 +1,73 @@
 /**
- * CLOUDINARY — image delivery + asset lookup.
+ * CLOUDINARY — simple, no-secrets image delivery.
  *
- * Photos live in Cloudinary and render with <CldImage> (see ImageBox). Cloudinary
- * appends a random suffix to uploads (e.g. `hero` becomes `hero_gq2zgp`) and, in
- * dynamic-folder accounts, the folder is metadata rather than part of the public
- * id. So we can't hardcode public ids — instead we list the account's images once
- * (cached) and resolve each slot by its *name*. Changing a photo is then pure
- * drag-and-drop in the Media Library. See docs/IMAGES.md.
+ * Photos live in Cloudinary and render with <CldImage> (responsive AVIF/WebP,
+ * subject-aware cropping, CDN cache). The ONLY configuration is the cloud name —
+ * no API key or secret. This relies on two one-time settings in the Cloudinary
+ * dashboard (see docs/IMAGES.md):
+ *   1. Upload preset: "use filename as public id" ON, "unique/random suffix" OFF
+ *      -> uploading hero.jpg stores it as exactly `hero`.
+ *   2. Security: "Resource list" un-restricted -> the public tag list powers the
+ *      gallery (tag photos `gallery` in the Media Library to show them).
  *
- * Env:
- *   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME — cloud name (client-visible; delivery URLs)
- *   CLOUDINARY_API_KEY / CLOUDINARY_API_SECRET — server-only; used to list assets
- *                                       so slots/gallery resolve. Unset => placeholders.
+ * The blur-up preview is generated server-side from a tiny blurred rendition and
+ * doubles as an existence check: if the fetch 404s (photo not uploaded yet), the
+ * caller falls back to the local SVG placeholder instead of a broken image.
+ *
+ * Env: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME. Unset => placeholders (dev/CI safe).
  */
 import type { ImageAsset } from "./images";
 
-// Trim to guard against a stray space/newline when the values are pasted into the
-// host's env settings — a common cause of a Cloudinary 401.
+// Trimmed to guard against stray whitespace pasted into host env settings.
 const CLOUD = (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "").trim();
-const KEY = (process.env.CLOUDINARY_API_KEY ?? "").trim();
-const SECRET = (process.env.CLOUDINARY_API_SECRET ?? "").trim();
 
-/** Enough to build delivery URLs. */
 export const cloudinaryConfigured = (): boolean => CLOUD.length > 0;
-/** Enough to list assets (resolve names -> public ids). */
-export const cloudinaryAdminConfigured = (): boolean =>
-  CLOUD.length > 0 && KEY.length > 0 && SECRET.length > 0;
-
-export type ResolvedAsset = { publicId: string; width: number; height: number; folder: string };
-
-type RawResource = {
-  public_id: string;
-  width: number;
-  height: number;
-  asset_folder?: string;
-  display_name?: string;
-};
-
-/** Strip Cloudinary's random upload suffix ("hero_gq2zgp" -> "hero"). */
-function stripSuffix(name: string): string {
-  return name.replace(/_[a-z0-9]{6}$/i, "");
-}
-
-/** Fetch every image in the account (cached via ISR). Empty when admin unset. */
-async function fetchAllImages(): Promise<RawResource[]> {
-  if (!cloudinaryAdminConfigured()) return [];
-  const auth = Buffer.from(`${KEY}:${SECRET}`).toString("base64");
-  const url = `https://api.cloudinary.com/v1_1/${CLOUD}/resources/image/upload?max_results=500`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Basic ${auth}` },
-    next: { revalidate: 300, tags: ["gallery", "images"] },
-  });
-  if (!res.ok) throw new Error(`Cloudinary list failed: ${res.status}`);
-  const data = (await res.json()) as { resources?: RawResource[] };
-  return data.resources ?? [];
-}
-
-/** All the lookup keys an asset can be found by (lowercased). */
-function keysFor(r: RawResource): string[] {
-  const last = r.public_id.split("/").pop() ?? r.public_id;
-  const base = stripSuffix(last);
-  const display = r.display_name ? stripSuffix(r.display_name) : "";
-  const folder = r.asset_folder ?? "";
-  const keys = [r.public_id, last, base, display];
-  if (folder && base) keys.push(`${folder}/${base}`);
-  if (folder && display) keys.push(`${folder}/${display}`);
-  return keys.filter(Boolean).map((k) => k.toLowerCase());
-}
-
-/** Build a name -> asset index from the account's images (cached, never throws). */
-async function getAssetIndex(): Promise<Map<string, ResolvedAsset>> {
-  const index = new Map<string, ResolvedAsset>();
-  let resources: RawResource[] = [];
-  try {
-    resources = await fetchAllImages();
-  } catch {
-    return index;
-  }
-  for (const r of resources) {
-    const asset: ResolvedAsset = {
-      publicId: r.public_id,
-      width: r.width,
-      height: r.height,
-      folder: r.asset_folder ?? "",
-    };
-    for (const k of keysFor(r)) {
-      if (!index.has(k)) index.set(k, asset);
-    }
-  }
-  return index;
-}
 
 /**
- * Resolve a slot id (e.g. "home/hero") to a real Cloudinary asset, tolerating the
- * upload suffix and folder mode. Returns null when not configured or not found
- * (caller then shows the local placeholder).
+ * Tiny blurred preview (~1KB) as a data URL for next/image's blur-up, fetched
+ * from Cloudinary and cached via ISR. Returns null when Cloudinary isn't
+ * configured, the photo doesn't exist, or the fetch fails — callers treat null
+ * as "show the placeholder".
  */
-export async function resolvePublicId(slotId: string): Promise<ResolvedAsset | null> {
+export async function blurDataUrlFor(publicId: string): Promise<string | null> {
   if (!cloudinaryConfigured()) return null;
-  const index = await getAssetIndex();
-  const last = slotId.split("/").pop() ?? slotId;
-  for (const key of [slotId, last]) {
-    const hit = index.get(key.toLowerCase());
-    if (hit) return hit;
-  }
-  return null;
-}
-
-/**
- * TEMPORARY diagnostic — surfaces what the deployed site sees so we can tell why
- * photos aren't resolving (config, what's actually in the account, and whether a
- * few slots match). No secrets are returned. Remove once images are working.
- */
-export async function debugInfo() {
-  const slots = ["home/hero", "parents/parent-dam", "about/about-portrait", "contact/contact-map"];
-  let resources: RawResource[] = [];
-  let fetchError: string | null = null;
+  const url = `https://res.cloudinary.com/${CLOUD}/image/upload/w_24,e_blur:1000,q_30,f_jpg/${publicId}`;
   try {
-    resources = await fetchAllImages();
-  } catch (e) {
-    fetchError = e instanceof Error ? e.message : String(e);
-  }
-  const samples = resources.slice(0, 20).map((r) => ({
-    public_id: r.public_id,
-    asset_folder: r.asset_folder ?? null,
-    display_name: r.display_name ?? null,
-    keys: keysFor(r),
-  }));
-  const resolved: Record<string, string | null> = {};
-  for (const s of slots) {
-    const hit = await resolvePublicId(s);
-    resolved[s] = hit ? hit.publicId : null;
-  }
-  let galleryCount = 0;
-  try {
-    galleryCount = (await galleryAssets()).length;
+    const res = await fetch(url, { next: { revalidate: 300, tags: ["images"] } });
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    return `data:image/jpeg;base64,${buf.toString("base64")}`;
   } catch {
-    /* ignore */
+    return null;
   }
-  return {
-    cloudNameConfigured: cloudinaryConfigured(),
-    adminConfigured: cloudinaryAdminConfigured(),
-    totalImagesFound: resources.length,
-    fetchError,
-    galleryCount,
-    resolvedSlots: resolved,
-    sampleAssets: samples,
-  };
 }
 
+type ListResource = { public_id: string; width: number; height: number };
+
 /**
- * Every image in the "gallery" folder, ordered by name. Falls back to matching
- * public ids that start with "gallery" when folder metadata isn't present.
+ * Every image tagged `gallery`, via Cloudinary's public tag list (no credentials;
+ * requires "Resource list" to be un-restricted in Cloudinary security settings).
+ * Ordered by name — prefix filenames 01-, 02-, … to control order. Returns []
+ * on any failure so the gallery falls back to placeholders.
  */
 export async function galleryAssets(): Promise<ImageAsset[]> {
-  let resources: RawResource[] = [];
+  if (!cloudinaryConfigured()) return [];
+  const url = `https://res.cloudinary.com/${CLOUD}/image/list/gallery.json`;
   try {
-    resources = await fetchAllImages();
+    const res = await fetch(url, { next: { revalidate: 300, tags: ["gallery", "images"] } });
+    if (!res.ok) return [];
+    const data = (await res.json()) as { resources?: ListResource[] };
+    return (data.resources ?? [])
+      .slice()
+      .sort((a, b) => a.public_id.localeCompare(b.public_id, undefined, { numeric: true }))
+      .map((r) => ({
+        cloudinaryId: r.public_id,
+        src: "/images/gallery-1.svg",
+        alt: "English Cream Golden Retriever — gallery photo",
+        width: r.width,
+        height: r.height,
+      }));
   } catch {
     return [];
   }
-  const inGallery = resources.filter((r) => {
-    if ((r.asset_folder ?? "").toLowerCase() === "gallery") return true;
-    const last = (r.public_id.split("/").pop() ?? "").toLowerCase();
-    return last.startsWith("gallery");
-  });
-  return inGallery
-    .sort((a, b) => a.public_id.localeCompare(b.public_id, undefined, { numeric: true }))
-    .map((r) => ({
-      cloudinaryId: r.public_id,
-      src: "/images/gallery-1.svg",
-      alt: "English Cream Golden Retriever — gallery photo",
-      width: r.width,
-      height: r.height,
-    }));
 }

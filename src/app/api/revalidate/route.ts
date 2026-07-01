@@ -2,13 +2,14 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 /**
- * On-demand revalidation for Airtable-backed content. Lets edits in Airtable
- * appear within seconds instead of waiting out the ISR window.
+ * On-demand revalidation for editable content (Airtable data + Cloudinary
+ * photos/gallery). Lets changes appear within seconds instead of waiting out
+ * the ~5 minute ISR window.
  *
  *   POST /api/revalidate?secret=YOUR_SECRET
  *
- * Set REVALIDATE_SECRET in the environment and call this from an Airtable
- * automation (optional — without it, edits still appear within ~5 min).
+ * Set REVALIDATE_SECRET in the environment; call it manually or from an
+ * automation (optional — without it, changes still appear within ~5 min).
  */
 export const runtime = "nodejs";
 
@@ -19,5 +20,6 @@ export async function POST(request: Request) {
   }
   revalidateTag("reserve");
   revalidateTag("gallery");
-  return NextResponse.json({ revalidated: true, tags: ["reserve", "gallery"] });
+  revalidateTag("images");
+  return NextResponse.json({ revalidated: true, tags: ["reserve", "gallery", "images"] });
 }

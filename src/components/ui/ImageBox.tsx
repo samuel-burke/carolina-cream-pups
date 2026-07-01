@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { ImageAsset } from "@/lib/images";
-import { resolvePublicId } from "@/lib/cloudinary";
+import { blurDataUrlFor } from "@/lib/cloudinary";
 import { CloudinaryImage } from "./CloudinaryImage";
 import styles from "./ImageBox.module.css";
 
@@ -22,9 +22,11 @@ type Props = {
 };
 
 /**
- * Aspect-ratio image frame. Real photos render through Cloudinary (<CldImage> —
- * responsive AVIF/WebP, blur-up, CDN cache); when Cloudinary isn't configured,
- * the local SVG placeholder is shown via next/image.
+ * Aspect-ratio image frame. Real photos render through Cloudinary (responsive
+ * AVIF/WebP, blur-up, subject-aware cropping). The blur preview is fetched
+ * server-side and doubles as an existence check: if the photo hasn't been
+ * uploaded (or Cloudinary is unset), the local SVG placeholder renders instead
+ * of a broken image.
  */
 export async function ImageBox({
   image,
@@ -36,8 +38,7 @@ export async function ImageBox({
   className,
   style,
 }: Props) {
-  // Resolve the real Cloudinary public id (handles the upload suffix + folder).
-  const resolved = image.cloudinaryId ? await resolvePublicId(image.cloudinaryId) : null;
+  const blur = image.cloudinaryId ? await blurDataUrlFor(image.cloudinaryId) : null;
   const cls = [
     styles.frame,
     keyline ? styles.keyline : styles.plainLine,
@@ -49,10 +50,11 @@ export async function ImageBox({
 
   return (
     <div className={cls} style={{ aspectRatio: ratio, ...style }}>
-      {resolved ? (
+      {image.cloudinaryId && blur ? (
         <CloudinaryImage
-          publicId={resolved.publicId}
+          publicId={image.cloudinaryId}
           alt={image.alt}
+          blurDataURL={blur}
           sizes={sizes}
           priority={priority}
           className={styles.img}
